@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaMagnifyingGlass } from 'react-icons/fa6';
 import {
@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import supabase from '@/config/supabaseClient';
 
 export default function NavBar() {
 	return (
@@ -88,6 +89,35 @@ function SearchBox() {
 }
 
 function SignInDialog() {
+	const [email, setEmail] = useState<string>('');
+	const [password, setPassword] = useState<string>('');
+	const [formFeedback, setFormFeedback] = useState<{
+		error: string;
+		success: string;
+	}>({
+		error: '',
+		success: '',
+	});
+
+	const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
+
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+
+		if (error) {
+			console.error('Sign in error:', error.message);
+			setFormFeedback({ error: error.message, success: '' });
+			return;
+		}
+
+		if (data) {
+			setFormFeedback({ error: '', success: 'Signed in successfully!' });
+		}
+	};
+
 	const inputs = [
 		{
 			label: 'Email',
@@ -108,13 +138,19 @@ function SignInDialog() {
 					SIGN IN
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='border-0 bg-slate-700 sm:max-w-[425px]'>
+			<DialogContent
+				className='border-0 bg-slate-700 sm:max-w-[425px]'
+				aria-describedby='Sign in form'
+			>
 				<DialogHeader>
 					<DialogTitle className='font-light'>SIGN IN TO JUKEBOXD</DialogTitle>
 				</DialogHeader>
-				<div className='grid gap-6 py-4'>
+				<div className='grid gap-4 py-4'>
 					{inputs.map(({ label, type, id }) => (
-						<div className='flex flex-col gap-2'>
+						<div
+							key={label}
+							className='flex flex-col gap-2'
+						>
 							<Label
 								htmlFor={id}
 								className='font-normal text-white'
@@ -124,15 +160,28 @@ function SignInDialog() {
 							<Input
 								id={id}
 								type={type}
+								onChange={(e) =>
+									label === 'Email'
+										? setEmail(e.target.value)
+										: setPassword(e.target.value)
+								}
 								className='focus:border-1 col-span-3 rounded-sm bg-slate-300 text-slate-600 focus:bg-white focus:text-black'
 							/>
 						</div>
 					))}
+
+					{formFeedback.error && (
+						<p className='text-red-500'>{formFeedback.error}</p>
+					)}
+					{formFeedback.success && (
+						<p className='text-green-500'>{formFeedback.success}</p>
+					)}
 				</div>
 				<DialogFooter>
 					<Button
 						type='submit'
-						className='bg-primary-600 hover:bg-primary-800 h-8 rounded-sm py-2 font-semibold'
+						className='h-8 rounded-sm bg-primary-600 py-2 font-semibold hover:bg-primary-800'
+						onClick={handleSubmit}
 					>
 						SIGN IN
 					</Button>
