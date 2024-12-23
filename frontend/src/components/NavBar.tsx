@@ -1,6 +1,6 @@
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { FaMagnifyingGlass } from 'react-icons/fa6';
+import { FaMagnifyingGlass, FaAngleDown } from 'react-icons/fa6';
 import {
 	Dialog,
 	DialogContent,
@@ -9,12 +9,35 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import supabase from '@/config/supabaseClient';
 
 export default function NavBar() {
+	const [userSignedIn, setUserSignedIn] = useState<boolean>(false);
+
+	useEffect(() => {
+		async function checkUser() {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			if (user) {
+				setUserSignedIn(true);
+			} else {
+				setUserSignedIn(false);
+			}
+		}
+
+		checkUser();
+	}, []);
+
 	return (
 		<section className='navbar justify-center bg-zinc-900'>
 			<div className='flex w-[1024px] items-center justify-between'>
@@ -28,7 +51,7 @@ export default function NavBar() {
 					</button>
 				</NavLink>
 				<div className='flex items-center gap-6'>
-					<SignInDialog />
+					{userSignedIn ? <ProfileDropdown /> : <SignInDialog />}
 					<NavLink
 						to='/albums'
 						className='text-sm font-semibold text-neutral-300 hover:text-white'
@@ -188,5 +211,33 @@ function SignInDialog() {
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
+	);
+}
+
+function ProfileDropdown() {
+	async function handleSignOut() {
+		const { error } = await supabase.auth.signOut();
+		if (error) {
+			console.error('Sign out error:', error.message);
+		}
+	}
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger className='flex h-8 w-32 items-center justify-center gap-2 rounded p-0 text-sm font-semibold text-neutral-300 hover:text-white data-[state=open]:bg-slate-400 data-[state=open]:text-white'>
+				PROFILE <FaAngleDown />
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className='rounded-sm border-0 bg-slate-400 p-0 text-slate-900'>
+				<DropdownMenuItem className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
+					Edit profile
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'
+					onClick={handleSignOut}
+				>
+					Sign out
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
