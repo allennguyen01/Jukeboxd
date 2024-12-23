@@ -1,11 +1,21 @@
+import { useEffect } from 'react';
 import Layout from './pages/Layout';
 import Login from './pages/Login';
 import Albums from './pages/Albums';
 import SearchResults from './pages/SearchResults';
 import Reviews from './pages/Reviews';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import supabase from './config/supabaseClient';
 
 function App() {
+	useEffect(() => {
+		supabase.auth.onAuthStateChange((event) => {
+			if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+				window.location.reload();
+			}
+		});
+	}, []);
+
 	return (
 		<BrowserRouter>
 			<Routes>
