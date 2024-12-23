@@ -8,14 +8,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import supabase from './config/supabaseClient';
 
 function App() {
-	useEffect(() => {
-		supabase.auth.onAuthStateChange((event) => {
-			if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-				window.location.reload();
-			}
-		});
-	}, []);
-
 	return (
 		<BrowserRouter>
 			<Routes>

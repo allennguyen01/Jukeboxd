@@ -122,7 +122,7 @@ function SignInDialog() {
 		success: '',
 	});
 
-	const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
+	const handleSignIn = async (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 
 		const { data, error } = await supabase.auth.signInWithPassword({
@@ -138,6 +138,7 @@ function SignInDialog() {
 
 		if (data) {
 			setFormFeedback({ error: '', success: 'Signed in successfully!' });
+			window.location.reload();
 		}
 	};
 
@@ -204,7 +205,7 @@ function SignInDialog() {
 					<Button
 						type='submit'
 						className='h-8 rounded-sm bg-primary-600 py-2 font-semibold hover:bg-primary-800'
-						onClick={handleSubmit}
+						onClick={handleSignIn}
 					>
 						SIGN IN
 					</Button>
@@ -219,7 +220,10 @@ function ProfileDropdown() {
 		const { error } = await supabase.auth.signOut();
 		if (error) {
 			console.error('Sign out error:', error.message);
+			return;
 		}
+
+		window.location.reload();
 	}
 
 	return (
