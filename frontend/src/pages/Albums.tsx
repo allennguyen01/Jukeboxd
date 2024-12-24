@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import spotifyClient from '../config/spotifyClient';
 import {
 	Carousel,
@@ -23,10 +23,6 @@ type NewAlbumCards = {
 type Album = { album: { id: string; album_type: string } };
 
 export default function Home() {
-	const [newAlbums, setNewAlbums] = useState<NewAlbumCards[]>([]);
-	const [hiphopAlbums, setHipHopAlbums] = useState<NewAlbumCards[]>([]);
-	const [rbAlbums, setRBAlbums] = useState<NewAlbumCards[]>([]);
-
 	function filter20Albums(items: Album[]) {
 		const itemAlbums = items.map((item: any) => item.album);
 		const seen = new Set();
@@ -38,35 +34,51 @@ export default function Home() {
 		return itemsFiltered.slice(0, 20);
 	}
 
-	useEffect(() => {
-		async function getAlbums() {
-			const response = await spotifyClient.get('/browse/new-releases?limit=20');
-			setNewAlbums(response.data.albums.items);
-		}
-		getAlbums();
-	}, []);
+	function getNewAlbums() {
+		return spotifyClient
+			.get('/browse/new-releases?limit=20')
+			.then((res) => res.data.albums.items);
+	}
 
-	// TODO: remove duplicate albums appearing, check ID
-	useEffect(() => {
-		async function getGenreAlbums() {
-			const response = await spotifyClient.get(
-				'search?q=genre%3A%22hip+hop%22+year%3A2024&type=track&market=US&limit=50',
-			);
-			setHipHopAlbums(filter20Albums(response.data.tracks.items));
-		}
-		getGenreAlbums();
-	}, []);
+	function getHiphopAlbums() {
+		return spotifyClient
+			.get(
+				'/search?q=genre%3A%22hip+hop%22+year%3A2024&type=track&market=US&limit=50',
+			)
+			.then((res) => filter20Albums(res.data.tracks.items));
+	}
 
-	// TODO: remove duplicate albums appearing, check ID
-	useEffect(() => {
-		async function getGenreAlbums() {
-			const response = await spotifyClient.get(
-				'search?q=genre%3A%22r%26b%22+year%3A2024&type=track&market=US&limit=50',
-			);
-			setRBAlbums(filter20Albums(response.data.tracks.items));
-		}
-		getGenreAlbums();
-	}, []);
+	const {
+		isPending: newAlbumsPending,
+		isError: newAlbumsErroring,
+		error: newAlbumsError,
+		data: newAlbums,
+	} = useQuery({
+		queryKey: ['newAlbums'],
+		queryFn: getNewAlbums,
+	});
+
+	const {
+		isPending: hiphopAlbumsPending,
+		isError: hiphopAlbumsErroring,
+		error: hiphopAlbumsError,
+		data: hiphopAlbums,
+	} = useQuery({
+		queryKey: ['hiphopAlbums'],
+		queryFn: getHiphopAlbums,
+	});
+
+	if (newAlbumsPending || hiphopAlbumsPending) {
+		return <p>Loading albums...</p>;
+	}
+
+	if (newAlbumsErroring) {
+		return <p>Error loading new albums: {newAlbumsError.message}</p>;
+	}
+
+	if (hiphopAlbumsErroring) {
+		return <p>Error loading hip hop albums: {hiphopAlbumsError.message}</p>;
+	}
 
 	return (
 		<div className='p-4'>
@@ -80,11 +92,6 @@ export default function Home() {
 				className='mx-3 mb-2'
 			/>
 			<FourAlbumCarousel newAlbums={hiphopAlbums} />
-			<HeaderDivider
-				text='R&B ALBUMS'
-				className='mx-3 mb-2'
-			/>
-			<FourAlbumCarousel newAlbums={rbAlbums} />
 		</div>
 	);
 }
