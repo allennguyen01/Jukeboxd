@@ -17,19 +17,25 @@ type NewAlbumCards = {
 	artists: { name: string }[];
 	release_date: string;
 	external_urls: { spotify: string };
+	album_type: string;
 };
 
-export default function Home() {
-	const [newAlbums, setNewAlbums] = useState([]);
-	const [hiphopAlbums, setHipHopAlbums] = useState([]);
-	const [rbAlbums, setRBAlbums] = useState([]);
+type Album = { album: { id: string; album_type: string } };
 
-	// TODO: add type checking
-	function filter20Albums(items: any) {
-		return items
-			.map((item: any) => item.album)
-			.filter((album: any) => album.album_type === 'album')
-			.slice(0, 20);
+export default function Home() {
+	const [newAlbums, setNewAlbums] = useState<NewAlbumCards[]>([]);
+	const [hiphopAlbums, setHipHopAlbums] = useState<NewAlbumCards[]>([]);
+	const [rbAlbums, setRBAlbums] = useState<NewAlbumCards[]>([]);
+
+	function filter20Albums(items: Album[]) {
+		const itemAlbums = items.map((item: any) => item.album);
+		const seen = new Set();
+		const itemsFiltered = itemAlbums.filter((album: NewAlbumCards) => {
+			const duplicate = seen.has(album.id);
+			seen.add(album.id);
+			return !duplicate && album.album_type === 'album';
+		});
+		return itemsFiltered.slice(0, 20);
 	}
 
 	useEffect(() => {
