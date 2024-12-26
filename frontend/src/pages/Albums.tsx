@@ -81,7 +81,7 @@ export default function Home() {
 	}
 
 	return (
-		<div className='p-4'>
+		<div className='m-4'>
 			<HeaderDivider
 				text='NEW ALBUM RELEASES'
 				className='mx-3 mb-2'
@@ -99,10 +99,10 @@ export default function Home() {
 function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
 	return (
 		<Carousel
-			className='min-h-96 w-full max-w-5xl'
+			className='mb-10 w-full max-w-5xl'
 			opts={{ slidesToScroll: 4 }}
 		>
-			<CarouselContent>
+			<CarouselContent className='max-h-80'>
 				{newAlbums.map((album: NewAlbumCards) => (
 					<CarouselItem
 						key={album.id}
@@ -113,12 +113,15 @@ function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
 							alt={album.name}
 							className='box-border h-56 max-w-56 rounded transition duration-150 hover:cursor-pointer hover:shadow-white'
 						/>
-						<div className='flex max-w-56 flex-col'>
-							<span className='inline-flex items-center gap-1 font-semibold'>
-								{album.name}
-								<SpotifyIconButton spotifyURL={album.external_urls.spotify} />
+						<div className='inline-flex max-w-56 flex-col overflow-hidden'>
+							<span className='inline-flex gap-1 overflow-hidden font-semibold'>
+								<p className='line-clamp-2'>{album.name}</p>
+								<SpotifyIconButton
+									spotifyURL={album.external_urls.spotify}
+									className='size-4 h-6'
+								/>
 							</span>
-							<p className='text-sm'>
+							<p className='line-clamp-1 text-sm'>
 								{album.artists.map((artist) => artist.name).join(', ')}
 							</p>
 						</div>
