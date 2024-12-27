@@ -36,10 +36,18 @@ export default function Home() {
 		return itemsFiltered.slice(0, 20);
 	}
 
+	function filterNewAlbums(data: SpotifyApi.ListOfNewReleasesResponse) {
+		const newAlbums = data.albums.items;
+		const itemsFiltered = newAlbums.filter(
+			(album) => album.album_type === 'album',
+		);
+		return itemsFiltered.slice(0, 20);
+	}
+
 	function getNewAlbums() {
 		return spotifyClient
-			.get('/browse/new-releases?limit=20')
-			.then((res) => res.data.albums.items);
+			.get('/browse/new-releases?limit=50')
+			.then((res) => filterNewAlbums(res.data));
 	}
 
 	function getHiphopAlbums() {
