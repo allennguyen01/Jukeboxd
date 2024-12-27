@@ -2,16 +2,22 @@ import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import spotifyClient from '@/config/spotifyClient';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table';
+import { Clock } from 'lucide-react';
+import { reduce } from 'lodash';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
 export default function Album() {
 	const { id } = useParams();
-
-	function msToMinAndSec(ms: number) {
-		const date = new Date(ms);
-		return `${date.getMinutes()}:${date.getSeconds()}`;
-	}
 
 	function getAlbum(): Promise<AlbumInfo> {
 		return spotifyClient.get(`/albums/${id}`).then((res) => res.data);
@@ -58,15 +64,50 @@ export default function Album() {
 				})}
 			</p>
 
-			<h3>Tracks</h3>
-			<ol className='list-inside list-decimal'>
-				{album.tracks.items.map((track) => (
-					<li key={track.id}>
-						{track.name} {msToMinAndSec(track.duration_ms)}{' '}
-						{track.artists.map((artist) => artist.name).join(', ')}
-					</li>
-				))}
-			</ol>
+			<TracksTable tracks={album.tracks.items} />
 		</div>
+	);
+}
+
+function TracksTable({
+	tracks,
+}: {
+	tracks: SpotifyApi.TrackObjectSimplified[];
+}) {
+	function msToMinAndSec(ms: number) {
+		const date = new Date(ms);
+		return `${date.getMinutes()}:${date.getSeconds() < 10 ? `${'0' + date.getSeconds()}` : date.getSeconds()}`;
+	}
+
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow className='border-neutral-600'>
+					<TableHead>#</TableHead>
+					<TableHead>Title</TableHead>
+					<TableHead>Artist</TableHead>
+					<TableHead className='flex items-center justify-end'>
+						<Clock size={16} />
+					</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{tracks.map((track) => (
+					<TableRow
+						key={track.id}
+						className='border-0'
+					>
+						<TableCell>{track.track_number}</TableCell>
+						<TableCell className='text-white'>{track.name}</TableCell>
+						<TableCell>
+							{track.artists.map((artist) => artist.name).join(', ')}
+						</TableCell>
+						<TableCell className='text-right'>
+							{msToMinAndSec(track.duration_ms)}
+						</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
 	);
 }
