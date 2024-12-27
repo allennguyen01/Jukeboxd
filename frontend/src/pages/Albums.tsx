@@ -12,23 +12,14 @@ import {
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 
-type NewAlbumCards = {
-	id: string;
-	images: { url: string }[];
-	name: string;
-	artists: { name: string }[];
-	release_date: string;
-	external_urls: { spotify: string };
-	album_type: string;
-};
-
-type Album = { album: { id: string; album_type: string } };
-
 export default function Home() {
-	function filter20Albums(items: Album[]) {
-		const itemAlbums = items.map((item: any) => item.album);
+	function filter20Albums(data: SpotifyApi.SearchResponse) {
+		const items = data.tracks?.items;
+		if (!items) return [];
+
+		const itemAlbums = items.map((item) => item.album);
 		const seen = new Set();
-		const itemsFiltered = itemAlbums.filter((album: NewAlbumCards) => {
+		const itemsFiltered = itemAlbums.filter((album) => {
 			const duplicate = seen.has(album.id);
 			seen.add(album.id);
 			return !duplicate && album.album_type === 'album';
@@ -55,7 +46,7 @@ export default function Home() {
 			.get(
 				'/search?q=genre%3A%22hip+hop%22+year%3A2024&type=track&market=US&limit=50',
 			)
-			.then((res) => filter20Albums(res.data.tracks.items));
+			.then((res) => filter20Albums(res.data));
 	}
 
 	const {
@@ -106,7 +97,11 @@ export default function Home() {
 	);
 }
 
-function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
+function FourAlbumCarousel({
+	newAlbums,
+}: {
+	newAlbums: SpotifyApi.AlbumObjectSimplified[];
+}) {
 	const navigate = useNavigate();
 
 	return (
@@ -115,7 +110,7 @@ function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
 			opts={{ slidesToScroll: 4 }}
 		>
 			<CarouselContent className='max-h-80'>
-				{newAlbums.map((album: NewAlbumCards) => (
+				{newAlbums.map((album) => (
 					<CarouselItem
 						key={album.id}
 						className='flex basis-1/4 flex-col items-center gap-2 py-1 text-center'
