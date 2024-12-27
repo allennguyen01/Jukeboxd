@@ -1,21 +1,23 @@
 import { FaSpotify } from 'react-icons/fa';
 
 export default function SpotifyIconButton({
-	spotifyURL,
+	url,
+	size = 16,
 	className,
 }: {
-	spotifyURL: string;
+	url: string;
+	size?: number;
 	className?: string;
 }) {
 	return (
 		<a
-			href={spotifyURL}
+			href={url}
 			target='_blank'
 			rel='noreferrer noopener'
 			onClick={(e) => e.stopPropagation()}
 		>
 			<FaSpotify
-				size={16}
+				size={size}
 				className={`fill-neutral-500 hover:fill-white ${className}`}
 			/>
 		</a>

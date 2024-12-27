@@ -52,7 +52,7 @@ export default function AlbumCard({ album }: { album: AlbumCardProps }) {
 							{releaseYear}
 						</span>
 
-						<SpotifyIconButton spotifyURL={spotifyURL} />
+						<SpotifyIconButton url={spotifyURL} />
 					</h2>
 
 					<TextCollapse text={`Available in: ${albumAvailableMarkets}`} />

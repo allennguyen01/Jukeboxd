@@ -117,7 +117,7 @@ function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
 							<span className='inline-flex gap-1 overflow-hidden font-semibold'>
 								<p className='line-clamp-2'>{album.name}</p>
 								<SpotifyIconButton
-									spotifyURL={album.external_urls.spotify}
+									url={album.external_urls.spotify}
 									className='size-4 h-6'
 								/>
 							</span>
