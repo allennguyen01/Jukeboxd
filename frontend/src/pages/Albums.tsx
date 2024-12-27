@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import spotifyClient from '../config/spotifyClient';
+
 import {
 	Carousel,
 	CarouselContent,
@@ -97,6 +99,8 @@ export default function Home() {
 }
 
 function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
+	const navigate = useNavigate();
+
 	return (
 		<Carousel
 			className='mb-10 w-full max-w-5xl'
@@ -112,6 +116,7 @@ function FourAlbumCarousel({ newAlbums }: { newAlbums: NewAlbumCards[] }) {
 							src={album.images[0].url}
 							alt={album.name}
 							className='box-border h-56 max-w-56 rounded transition duration-150 hover:cursor-pointer hover:shadow-white'
+							onClick={() => navigate(`/album/${album.id}`)}
 						/>
 						<div className='inline-flex max-w-56 flex-col overflow-hidden'>
 							<span className='inline-flex gap-1 overflow-hidden font-semibold'>
