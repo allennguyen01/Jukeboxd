@@ -12,5 +12,15 @@ export default defineConfig({
 	},
 	build: {
 		target: 'esnext',
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					react: ['react', 'react-dom', 'react-router-dom'],
+					axios: ['axios'],
+					supabase: ['@supabase/supabase-js'],
+					lodash: ['lodash'],
+				},
+			},
+		},
 	},
 });
