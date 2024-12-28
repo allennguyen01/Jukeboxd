@@ -12,12 +12,8 @@
 	}
 }
 
-.clamped {
-	@apply line-clamp-3 break-words;
-}
-
 @layer base {
-  :root {
+	:root {
 		--radius: 0.5rem;
 	}
 }
