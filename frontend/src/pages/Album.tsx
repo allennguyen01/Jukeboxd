@@ -1,22 +1,29 @@
-import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import spotifyClient from '@/config/spotifyClient';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import {
 	Table,
 	TableBody,
-	TableCaption,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
 import { Clock } from 'lucide-react';
-import { reduce } from 'lodash';
+import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
+import TextCollapse from '@/components/TextCollapse';
+import HeaderDivider from '@/components/typography/HeaderDivider';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
+function msToMinAndSec(ms: number) {
+	const date = new Date(ms);
+	return `${date.getMinutes()}:${date.getSeconds() < 10 ? `${'0' + date.getSeconds()}` : date.getSeconds()}`;
+}
+
 export default function Album() {
+	const navigate = useNavigate();
 	const { id } = useParams();
 
 	function getAlbum(): Promise<AlbumInfo> {
@@ -33,39 +40,113 @@ export default function Album() {
 	if (isPending) return <div>Loading...</div>;
 	if (isError) return <div>Error: {error.message}</div>;
 
-	console.log(album);
+	const infoTable = {
+		'Record Label': album.label,
+		Release: new Date(album.release_date).toLocaleDateString(undefined, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+		}),
+		'Total Tracks': album.total_tracks,
+		Duration: msToMinAndSec(
+			album.tracks.items.reduce(
+				(sumDuration, track) => sumDuration + track.duration_ms,
+				0,
+			),
+		),
+		'Popularity (0-100)': album.popularity,
+	};
 
 	return (
-		<div>
-			<img
-				src={album.images[0].url}
-				alt={album.name}
-			/>
+		<div className='relative m-4 grid max-w-5xl grid-cols-4'>
+			<div className='sticky top-2 flex h-min max-w-64 flex-col'>
+				<img
+					src={album.images[0].url}
+					alt={album.name}
+					className='size-64 rounded-sm'
+				/>
 
-			<SpotifyIconButton
-				size={30}
-				url={album.external_urls.spotify}
-			/>
+				<SpotifyIconButton
+					size={30}
+					url={album.external_urls.spotify}
+					className='my-4'
+				/>
 
-			<h1>
-				{album.name} {new Date(album.release_date).getFullYear()} Performed by{' '}
-				{album.artists.map((artist) => artist.name).join(', ')}
-			</h1>
+				<InfoTable infoTable={infoTable} />
+			</div>
 
-			<p>Label: {album.label}</p>
-			<p>Total tracks: {album.total_tracks}</p>
-			<p>Type: {album.album_type}</p>
-			<p>
-				Release date:{' '}
-				{new Date(album.release_date).toLocaleDateString(undefined, {
-					year: 'numeric',
-					month: 'long',
-					day: 'numeric',
-				})}
-			</p>
+			<div className='col-span-3 ml-10 flex flex-col gap-4'>
+				<AlbumTitle album={album} />
 
-			<TracksTable tracks={album.tracks.items} />
+				<section>
+					<HeaderDivider
+						text='TRACKS'
+						className='mb-2'
+					/>
+					<TracksTable tracks={album.tracks.items} />
+				</section>
+
+				<section>
+					<HeaderDivider
+						text='AVAILABLE MARKETS'
+						className='mb-2'
+					/>
+					<TextCollapse
+						text={
+							album.available_markets
+								?.map((album) => {
+									return ISO3166ToString[album.toUpperCase()];
+								})
+								.join(', ') || 'N/A'
+						}
+					/>
+				</section>
+			</div>
 		</div>
+	);
+}
+
+function InfoTable({
+	infoTable,
+}: {
+	infoTable: Record<string, string | number>;
+}) {
+	return (
+		<Table>
+			<TableBody>
+				{Object.entries(infoTable).map(([key, value]) => (
+					<TableRow key={key}>
+						<TableCell className='min-w-32 p-0'>{key}</TableCell>
+						<TableCell className='break-words text-white'>{value}</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
+	);
+}
+
+function AlbumTitle({ album }: { album: AlbumInfo }) {
+	const navigate = useNavigate();
+
+	return (
+		<section>
+			<h1 className='font-playfair text-2xl font-semibold text-white'>
+				{album.name}
+			</h1>
+			<p>
+				Performed by{' '}
+				<span className='inline-flex gap-1'>
+					{album.artists.map((artist) => (
+						<a
+							className='underline hover:cursor-pointer hover:text-accent-600'
+							onClick={() => navigate(`/artist/${artist.id}`)}
+						>
+							{artist.name}
+						</a>
+					))}
+				</span>
+			</p>
+		</section>
 	);
 }
 
@@ -74,11 +155,6 @@ function TracksTable({
 }: {
 	tracks: SpotifyApi.TrackObjectSimplified[];
 }) {
-	function msToMinAndSec(ms: number) {
-		const date = new Date(ms);
-		return `${date.getMinutes()}:${date.getSeconds() < 10 ? `${'0' + date.getSeconds()}` : date.getSeconds()}`;
-	}
-
 	return (
 		<Table>
 			<TableHeader>
@@ -97,7 +173,7 @@ function TracksTable({
 						key={track.id}
 						className='border-0'
 					>
-						<TableCell>{track.track_number}</TableCell>
+						<TableCell className='text-right'>{track.track_number}</TableCell>
 						<TableCell className='text-white'>{track.name}</TableCell>
 						<TableCell>
 							{track.artists.map((artist) => artist.name).join(', ')}

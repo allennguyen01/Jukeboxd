@@ -15,6 +15,7 @@ export default function SpotifyIconButton({
 			target='_blank'
 			rel='noreferrer noopener'
 			onClick={(e) => e.stopPropagation()}
+			className='flex justify-center'
 		>
 			<FaSpotify
 				size={size}
