@@ -44,7 +44,7 @@ export default function NavBar() {
 				<NavLink to='/'>
 					<button className='btn h-full gap-4 bg-transparent'>
 						<img
-							src='../../public/logo.svg'
+							src='/logo.svg'
 							className='h-10'
 						/>
 						<p className='text-3xl font-bold text-white'>Jukeboxd</p>
