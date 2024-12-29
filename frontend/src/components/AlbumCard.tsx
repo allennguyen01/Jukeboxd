@@ -1,88 +1,82 @@
-import ReviewModalForm from './ReviewModalForm';
-import { FaSpotify } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import ISO3166ToString from '../data/ISO3166-1.alpha-2';
 import TextCollapse from './TextCollapse';
 import SpotifyIconButton from './icon/SpotifyIconButton';
+import spotifyClient from '@/config/spotifyClient';
+import { useQuery } from '@tanstack/react-query';
 
-type AlbumCardProps = {
-	id: string;
-	name: string;
-	artists: { id: string; name: string }[];
-	images: { url: string }[];
-	release_date: string;
-	available_markets: string[];
-	external_urls: { spotify: string };
-};
+type AlbumCardProps = SpotifyApi.AlbumObjectSimplified;
 
 export default function AlbumCard({ album }: { album: AlbumCardProps }) {
-	const id = album.id;
-	const name = album.name;
-	const artists = album.artists;
-	const coverURL = album.images[0].url;
-	const releaseYear = new Date(album.release_date).getFullYear();
-	const albumAvailableMarkets = album.available_markets
-		.map((album) => {
-			return ISO3166ToString[album.toUpperCase()];
-		})
-		.join(', ');
-	const spotifyURL = album.external_urls.spotify;
-
-	const navigate = useNavigate();
-
 	return (
-		<div>
-			<div
-				className='card card-side rounded-none border-b-[1px] border-neutral-600 pb-4 hover:cursor-pointer'
-				onClick={() =>
-					(
-						document.getElementById(`review-modal-${name}`) as HTMLDialogElement
-					).showModal()
-				}
+		<div className='flex max-w-5xl gap-8 border-b-[1px] border-neutral-600 pb-4'>
+			<a
+				href={`/album/${album.id}`}
+				className='flex-shrink-0'
 			>
 				<img
-					src={coverURL}
-					alt={`${name} album cover`}
-					className='h-28 w-28 rounded-sm'
+					src={album.images[0].url}
+					alt={`${album.name} album cover`}
+					className='size-28 rounded-sm transition duration-150 hover:cursor-pointer hover:shadow-white'
 				/>
-				<div className='card-body py-0'>
-					<h2 className='card-title font-semibold text-white'>
-						{name}
-						<span className='font-sans font-thin text-neutral-content'>
-							{releaseYear}
-						</span>
+			</a>
 
-						<SpotifyIconButton url={spotifyURL} />
-					</h2>
+			<div className='flex flex-col gap-3'>
+				<h2 className='flex items-baseline gap-2'>
+					<a
+						href={`/album/${album.id}`}
+						className='font-playfair text-xl font-extrabold text-white hover:text-primary-600'
+					>
+						{album.name}
+					</a>
+					<p className='font-sans text-lg font-thin text-neutral-content'>
+						{new Date(album.release_date).getFullYear()}
+					</p>
+					<SpotifyIconButton url={album.external_urls.spotify} />
+				</h2>
 
-					<TextCollapse text={`Available in: ${albumAvailableMarkets}`} />
+				<section>
+					<TracksCollapse albumID={album.id} />
+				</section>
 
-					<div className='flex flex-row items-center'>
-						<span className='mr-1 font-thin'>Performed by </span>
-						<div className='flex gap-1'>
-							{artists.map((artist) => (
-								<button
-									key={artist.id}
-									className='btn btn-neutral btn-xs rounded-sm px-1 py-0'
-									onClick={(e) => {
-										e.stopPropagation();
-										navigate(`/search/${artist.name}`);
-									}}
-								>
-									{artist.name}
-								</button>
-							))}
-						</div>
-					</div>
+				<div className='flex flex-row items-center'>
+					<span className='mr-1 font-light'>Performed by </span>
+					<span className='flex flex-wrap gap-1'>
+						{album.artists.map((artist) => (
+							<a
+								key={artist.id}
+								className='rounded-sm bg-gray-700 px-2 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-300'
+								href={`/search/${artist.name}`}
+							>
+								{artist.name}
+							</a>
+						))}
+					</span>
 				</div>
 			</div>
-
-			<ReviewModalForm
-				id={id}
-				name={name}
-				coverURL={coverURL}
-				year={releaseYear}
-			/>
 		</div>
 	);
+}
+
+function TracksCollapse({ albumID }: { albumID: string }) {
+	function getTracks() {
+		return spotifyClient
+			.get(`albums/${albumID}`)
+			.then((res) => res.data.tracks.items);
+	}
+
+	const {
+		isPending,
+		isError,
+		error,
+		data: tracks,
+	} = useQuery<SpotifyApi.TrackObjectSimplified[]>({
+		queryKey: ['tracks', albumID],
+		queryFn: getTracks,
+	});
+
+	if (isPending) return <div>Tracks: loading...</div>;
+	if (isError) return <div>Tracks: error ({error.message})</div>;
+
+	const trackNames = tracks.map((track) => track.name).join(', ');
+
+	return <TextCollapse text={`Tracks: ${trackNames}`} />;
 }
