@@ -1,4 +1,4 @@
-import { useState, MouseEvent, useEffect } from 'react';
+import { useState, MouseEvent } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaMagnifyingGlass, FaAngleDown } from 'react-icons/fa6';
 import {
@@ -18,25 +18,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import supabase from '@/config/supabaseClient';
+import supabase, { useUser } from '@/config/supabaseClient';
 
 export default function NavBar() {
-	const [userSignedIn, setUserSignedIn] = useState<boolean>(false);
-
-	useEffect(() => {
-		async function checkUser() {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			if (user) {
-				setUserSignedIn(true);
-			} else {
-				setUserSignedIn(false);
-			}
-		}
-
-		checkUser();
-	}, []);
+	const { data: user } = useUser();
 
 	return (
 		<section className='navbar justify-center bg-zinc-900'>
@@ -51,7 +36,7 @@ export default function NavBar() {
 					</button>
 				</NavLink>
 				<div className='flex items-center gap-6'>
-					{userSignedIn ? <ProfileDropdown /> : <SignInDialog />}
+					{user ? <ProfileDropdown /> : <SignInDialog />}
 					<NavLink
 						to='/albums'
 						className='text-sm font-semibold text-neutral-300 hover:text-white'
