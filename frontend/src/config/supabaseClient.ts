@@ -5,22 +5,40 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function fetchUser() {
-	const { data: user, error } = await supabase.auth.getUser();
-	if (error) {
-		throw new Error(error.message);
-	}
-	return user;
-}
-
 function useUser() {
+	async function getUser() {
+		const { data: user, error } = await supabase.auth.getUser();
+		if (error) {
+			throw new Error(error.message);
+		}
+		return user;
+	}
+
 	return useQuery({
-		queryKey: ['userSession'],
-		queryFn: fetchUser,
+		queryKey: ['user'],
+		queryFn: getUser,
 		staleTime: 1000 * 60 * 5,
 		retry: false,
 	});
 }
 
+function useReviews() {
+	async function getReviews() {
+		const { data: reviews, error } = await supabase
+			.from('reviews')
+			.select()
+			.order('created_at', { ascending: false });
+		if (error) {
+			throw new Error(error.message);
+		}
+		return reviews;
+	}
+
+	return useQuery({
+		queryKey: ['reviews'],
+		queryFn: getReviews,
+	});
+}
+
 export default supabase;
-export { useUser };
+export { useUser, useReviews };

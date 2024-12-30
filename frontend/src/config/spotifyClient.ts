@@ -1,3 +1,4 @@
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import axios from 'axios';
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
@@ -40,5 +41,17 @@ async function createSpotifyClient() {
 	return instance;
 }
 
+function useAlbum(id: string): UseQueryResult<SpotifyApi.SingleAlbumResponse> {
+	function getAlbum() {
+		return spotifyClient.get(`albums/${id}`).then((res) => res.data);
+	}
+
+	return useQuery({
+		queryKey: ['album', id],
+		queryFn: getAlbum,
+	});
+}
+
 const spotifyClient = await createSpotifyClient();
 export default spotifyClient;
+export { useAlbum };
