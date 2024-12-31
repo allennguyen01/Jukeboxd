@@ -1,15 +1,7 @@
 import { useAlbum } from '@/config/spotifyClient';
 import { useReviews } from '../config/supabaseClient';
 import ReviewRatingStars from '@/components/ReviewRatingStars';
-
-type AlbumReview = {
-	id: string;
-	user_id: string;
-	created_at: Date;
-	album_name: string;
-	rating: number;
-	review: string;
-};
+import { AlbumReview } from '@/types/supabaseTypes';
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
@@ -74,7 +66,6 @@ function AlbumReviewCard({
 
 				<div className='flex items-center gap-2'>
 					<ReviewRatingStars
-						albumName={albumName}
 						readOnly={true}
 						rating={rating}
 					/>

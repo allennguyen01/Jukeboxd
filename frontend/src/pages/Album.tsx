@@ -14,6 +14,10 @@ import { Clock } from 'lucide-react';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
+import supabase, { useUser } from '@/config/supabaseClient';
+import { Button } from '@/components/ui/button';
+import { FormEvent, useState } from 'react';
+import ReviewRatingStars from '@/components/ReviewRatingStars';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -23,7 +27,6 @@ function msToMinAndSec(ms: number) {
 }
 
 export default function Album() {
-	const navigate = useNavigate();
 	const { id } = useParams();
 
 	function getAlbum(): Promise<AlbumInfo> {
@@ -80,6 +83,14 @@ export default function Album() {
 
 				<section>
 					<HeaderDivider
+						text='YOUR REVIEW'
+						className='mb-2'
+					/>
+					<YourReview album={album} />
+				</section>
+
+				<section>
+					<HeaderDivider
 						text='TRACKS'
 						className='mb-2'
 					/>
@@ -103,6 +114,114 @@ export default function Album() {
 				</section>
 			</div>
 		</div>
+	);
+}
+
+function YourReview({ album }: { album: AlbumInfo }) {
+	const { isPending, isError, error, data: user } = useUser();
+
+	if (isPending) return <div>Loading...</div>;
+	if (isError) return <div>Error: {error.message}</div>;
+
+	if (!user) {
+		return (
+			<Button className='w-full text-slate-400 hover:text-slate-100'>
+				Sign in to log, rate, or leave a review
+			</Button>
+		);
+	}
+
+	return <ReviewForm album={album} />;
+}
+
+function ReviewForm({ album }: { album: AlbumInfo }) {
+	const [review, setReview] = useState('');
+	const [rating, setRating] = useState(0);
+	const [formError, setFormError] = useState<string | null>('');
+	const [formSuccess, setFormSuccess] = useState<string | null>('');
+	const { data: user } = useUser();
+
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+
+		const { data, error } = await supabase
+			.from('reviews')
+			.insert([
+				{
+					id: album.id,
+					user_id: user?.user.id,
+					album_name: album.name,
+					rating,
+					review,
+				},
+			])
+			.select();
+
+		if (error) {
+			console.error('Error inserting review:', error);
+			if (error.code === '23505') {
+				setFormError('Review already exists.');
+			} else {
+				setFormError(
+					`Error inserting review. Please try again. Error: ${error.message}`,
+				);
+			}
+			setFormSuccess(null);
+		}
+
+		if (data) {
+			setFormSuccess('Review saved successfully!');
+			setFormError(null);
+		}
+	}
+
+	return (
+		<form
+			method='dialog'
+			onSubmit={handleSubmit}
+			className='flex flex-col gap-2'
+		>
+			<ReviewRatingStars
+				required
+				setRating={setRating}
+			/>
+			<ReviewTextBox setReview={setReview} />
+
+			{formError && <p className='text-red-500'>{formError}</p>}
+			{formSuccess && <p className='text-green-500'>{formSuccess}</p>}
+
+			<button
+				className='btn mt-4'
+				type='submit'
+			>
+				Save
+			</button>
+		</form>
+	);
+}
+
+function ReviewTextBox({
+	setReview,
+	required = false,
+}: {
+	setReview: (review: string) => void;
+	required?: boolean;
+}) {
+	return (
+		<label className='form-control'>
+			<div className='label px-0 py-2'>
+				<span className='label-text text-base'>Review</span>
+			</div>
+			<textarea
+				name='review'
+				required={required}
+				className='textarea textarea-bordered h-24'
+				placeholder='Leave a review...'
+				onChange={(e) => {
+					setReview(e.target.value);
+				}}
+			></textarea>
+		</label>
 	);
 }
 
@@ -139,6 +258,7 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 					{album.artists.map((artist) => (
 						<a
 							className='underline hover:cursor-pointer hover:text-accent-600'
+							key={artist.id}
 							onClick={() => navigate(`/artist/${artist.id}`)}
 						>
 							{artist.name}
