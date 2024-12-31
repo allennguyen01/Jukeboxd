@@ -1,7 +1,11 @@
-import spotifyClient from '@/config/spotifyClient';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FormEvent, useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
+import spotifyClient from '@/config/spotifyClient';
+import supabase, { useUser } from '@/config/supabaseClient';
+import { User } from '@supabase/supabase-js';
+
 import {
 	Table,
 	TableBody,
@@ -14,9 +18,7 @@ import { Clock } from 'lucide-react';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
-import supabase, { useUser } from '@/config/supabaseClient';
 import { Button } from '@/components/ui/button';
-import { FormEvent, useState } from 'react';
 import ReviewRatingStars from '@/components/ReviewRatingStars';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
@@ -131,15 +133,19 @@ function YourReview({ album }: { album: AlbumInfo }) {
 		);
 	}
 
-	return <ReviewForm album={album} />;
+	return (
+		<ReviewForm
+			album={album}
+			user={user}
+		/>
+	);
 }
 
-function ReviewForm({ album }: { album: AlbumInfo }) {
+function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 	const [review, setReview] = useState('');
 	const [rating, setRating] = useState(0);
 	const [formError, setFormError] = useState<string | null>('');
 	const [formSuccess, setFormSuccess] = useState<string | null>('');
-	const { data: user } = useUser();
 
 	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -149,7 +155,7 @@ function ReviewForm({ album }: { album: AlbumInfo }) {
 			.insert([
 				{
 					id: album.id,
-					user_id: user?.user.id,
+					user_id: user.id,
 					album_name: album.name,
 					rating,
 					review,

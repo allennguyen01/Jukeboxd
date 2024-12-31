@@ -7,18 +7,16 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 function useUser() {
 	async function getUser() {
-		const { data: user, error } = await supabase.auth.getUser();
-		if (error) {
-			throw new Error(error.message);
-		}
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
 		return user;
 	}
 
 	return useQuery({
 		queryKey: ['user'],
 		queryFn: getUser,
-		staleTime: 1000 * 60 * 5,
-		retry: false,
 	});
 }
 
