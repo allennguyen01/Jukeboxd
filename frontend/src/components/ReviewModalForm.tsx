@@ -89,10 +89,7 @@ export default function ReviewModalForm({
 					className='flex flex-col gap-2'
 				>
 					<ReviewTextBox setReview={setReview} />
-					<ReviewRatingStars
-						albumName={name}
-						setRating={setRating}
-					/>
+					<ReviewRatingStars setRating={setRating} />
 
 					{formError && <p className='text-red-500'>{formError}</p>}
 					{formSuccess && <p className='text-green-500'>{formSuccess}</p>}
