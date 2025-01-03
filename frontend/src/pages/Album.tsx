@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import spotifyClient from '@/config/spotifyClient';
 import supabase, { useUser } from '@/config/supabaseClient';
@@ -14,7 +14,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { Clock } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
@@ -281,35 +281,64 @@ function TracksTable({
 }: {
 	tracks: SpotifyApi.TrackObjectSimplified[];
 }) {
+	const [expanded, setExpanded] = useState(false);
+	const tableRef = useRef<HTMLTableElement>(null);
+	const isTableTooTall = tableRef.current?.clientHeight ?? 0 > 400;
+
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow className='border-neutral-600'>
-					<TableHead>#</TableHead>
-					<TableHead>Title</TableHead>
-					<TableHead>Artist</TableHead>
-					<TableHead className='flex items-center justify-end'>
-						<Clock size={16} />
-					</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{tracks.map((track) => (
-					<TableRow
-						key={track.id}
-						className='border-0'
-					>
-						<TableCell className='text-right'>{track.track_number}</TableCell>
-						<TableCell className='text-white'>{track.name}</TableCell>
-						<TableCell>
-							{track.artists.map((artist) => artist.name).join(', ')}
-						</TableCell>
-						<TableCell className='text-right'>
-							{msToMinAndSec(track.duration_ms)}
-						</TableCell>
+		<>
+			<Table
+				className={`w-full ${expanded ? '' : 'inline-block max-h-96 overflow-hidden'}`}
+				ref={tableRef}
+			>
+				<TableHeader>
+					<TableRow className='border-neutral-600'>
+						<TableHead>#</TableHead>
+						<TableHead>Title</TableHead>
+						<TableHead>Artist</TableHead>
+						<TableHead className='flex items-center justify-end'>
+							<Clock size={16} />
+						</TableHead>
 					</TableRow>
-				))}
-			</TableBody>
-		</Table>
+				</TableHeader>
+				<TableBody>
+					{tracks.map((track) => (
+						<TableRow
+							key={track.id}
+							className='border-0'
+						>
+							<TableCell className='text-right'>{track.track_number}</TableCell>
+							<TableCell className='text-white'>{track.name}</TableCell>
+							<TableCell>
+								{track.artists.map((artist) => artist.name).join(', ')}
+							</TableCell>
+							<TableCell className='text-right'>
+								{msToMinAndSec(track.duration_ms)}
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+			{!isTableTooTall && (
+				<Button
+					variant='ghost'
+					size='sm'
+					className='w-full rounded-sm border border-neutral-600'
+					onClick={() => setExpanded(!expanded)}
+				>
+					{expanded ? (
+						<>
+							View Less
+							<ChevronUp size={16} />
+						</>
+					) : (
+						<>
+							View More
+							<ChevronDown size={16} />
+						</>
+					)}
+				</Button>
+			)}
+		</>
 	);
 }
