@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FormEvent, useRef, useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
-import spotifyClient from '@/config/spotifyClient';
+import spotifyClient, { useAlbumGenres } from '@/config/spotifyClient';
 import supabase, { useUser } from '@/config/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
@@ -45,23 +45,6 @@ export default function Album() {
 	if (isPending) return <div>Loading...</div>;
 	if (isError) return <div>Error: {error.message}</div>;
 
-	const infoTable = {
-		'Record Label': album.label,
-		Release: new Date(album.release_date).toLocaleDateString(undefined, {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		}),
-		'Total Tracks': album.total_tracks,
-		Duration: msToMinAndSec(
-			album.tracks.items.reduce(
-				(sumDuration, track) => sumDuration + track.duration_ms,
-				0,
-			),
-		),
-		'Popularity (0-100)': album.popularity,
-	};
-
 	return (
 		<div className='relative m-4 grid max-w-5xl grid-cols-4'>
 			<div className='sticky top-2 flex h-min max-w-64 flex-col'>
@@ -77,7 +60,7 @@ export default function Album() {
 					className='my-4'
 				/>
 
-				<InfoTable infoTable={infoTable} />
+				<InfoTable album={album} />
 			</div>
 
 			<div className='col-span-3 ml-10 flex flex-col gap-4'>
@@ -231,11 +214,25 @@ function ReviewTextBox({
 	);
 }
 
-function InfoTable({
-	infoTable,
-}: {
-	infoTable: Record<string, string | number>;
-}) {
+function InfoTable({ album }: { album: AlbumInfo }) {
+	const infoTable = {
+		'Record Label': album.label,
+		Release: new Date(album.release_date).toLocaleDateString(undefined, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+		}),
+		Genres: <GenreList album={album} />,
+		'Total Tracks': album.total_tracks,
+		Duration: msToMinAndSec(
+			album.tracks.items.reduce(
+				(sumDuration, track) => sumDuration + track.duration_ms,
+				0,
+			),
+		),
+		'Popularity (0-100)': album.popularity,
+	};
+
 	return (
 		<Table>
 			<TableBody>
@@ -274,6 +271,15 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 			</p>
 		</section>
 	);
+}
+
+function GenreList({ album }: { album: AlbumInfo }) {
+	const { isPending, isError, error, data: genres } = useAlbumGenres(album);
+
+	if (isPending) return 'Loading...';
+	if (isError) return `Error: ${error.message}`;
+
+	return genres;
 }
 
 function TracksTable({

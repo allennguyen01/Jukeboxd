@@ -52,6 +52,32 @@ function useAlbum(id: string): UseQueryResult<SpotifyApi.SingleAlbumResponse> {
 	});
 }
 
+function useAlbumGenres(
+	album: SpotifyApi.SingleAlbumResponse,
+): UseQueryResult<string[]> {
+	function getAlbumGenres(album: SpotifyApi.SingleAlbumResponse) {
+		const artistsList = album.artists.map((artist) => artist.id).join(',');
+
+		const artistGenres = spotifyClient
+			.get(`artists?ids=${artistsList}`)
+			.then((res) =>
+				res.data.artists
+					.map((artist: SpotifyApi.ArtistObjectFull) => artist.genres)
+					.flat()
+					.join(', '),
+			);
+
+		return artistGenres;
+	}
+
+	return useQuery({
+		queryKey: ['albumGenres', album.id],
+		queryFn: () => {
+			return getAlbumGenres(album);
+		},
+	});
+}
+
 const spotifyClient = await createSpotifyClient();
 export default spotifyClient;
-export { useAlbum };
+export { useAlbum, useAlbumGenres };
