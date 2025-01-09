@@ -20,6 +20,7 @@ import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import { Button } from '@/components/ui/button';
 import ReviewRatingStars from '@/components/ReviewRatingStars';
+import IconToggle from '@/components/IconToggle';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -127,6 +128,7 @@ function YourReview({ album }: { album: AlbumInfo }) {
 function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 	const [review, setReview] = useState('');
 	const [rating, setRating] = useState(0);
+	const [listened, setListened] = useState(false);
 	const [formError, setFormError] = useState<string | null>('');
 	const [formSuccess, setFormSuccess] = useState<string | null>('');
 
@@ -142,6 +144,7 @@ function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 					album_name: album.name,
 					rating,
 					review,
+					listened,
 				},
 			])
 			.select();
@@ -170,10 +173,17 @@ function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 			onSubmit={handleSubmit}
 			className='flex flex-col gap-2'
 		>
-			<ReviewRatingStars
-				required
-				setRating={setRating}
-			/>
+			<section className='flex items-center gap-8'>
+				<ReviewRatingStars
+					required
+					setRating={setRating}
+				/>
+				<IconToggle
+					checked={listened}
+					setChecked={setListened}
+				/>
+			</section>
+
 			<ReviewTextBox setReview={setReview} />
 
 			{formError && <p className='text-red-500'>{formError}</p>}
