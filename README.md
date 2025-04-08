@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/allennguyen01/Jukeboxd">
-    <img src="./frontend/public/logo.svg" alt="Logo" width="300">
+    <img src="./public/logo.svg" alt="Logo" width="300">
   </a>
 
   <h1>Jukeboxd</h1>
