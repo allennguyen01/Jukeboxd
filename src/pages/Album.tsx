@@ -335,24 +335,26 @@ function TracksTable({
 					))}
 				</TableBody>
 			</Table>
-			{!isTableTooTall && (
+			{isTableTooTall && !expanded && (
 				<Button
 					variant='ghost'
 					size='sm'
 					className='w-full rounded-sm border border-neutral-600'
 					onClick={() => setExpanded(!expanded)}
 				>
-					{expanded ? (
-						<>
-							View Less
-							<ChevronUp size={16} />
-						</>
-					) : (
-						<>
-							View More
-							<ChevronDown size={16} />
-						</>
-					)}
+					View More
+					<ChevronDown size={16} />
+				</Button>
+			)}
+			{expanded && (
+				<Button
+					variant='ghost'
+					size='sm'
+					className='w-full rounded-sm border border-neutral-600'
+					onClick={() => setExpanded(!expanded)}
+				>
+					View Less
+					<ChevronUp size={16} />
 				</Button>
 			)}
 		</>
