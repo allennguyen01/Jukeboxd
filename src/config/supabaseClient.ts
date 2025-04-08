@@ -1,5 +1,6 @@
+import { AlbumReview } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -38,5 +39,24 @@ function useReviews() {
 	});
 }
 
+function addReview(
+	albumReview: Pick<AlbumReview, 'id' | 'album_name' | 'rating' | 'review'>,
+) {
+	async function insertReview() {
+		const { data, error } = await supabase
+			.from('reviews')
+			.insert([albumReview])
+			.select();
+
+		if (error) {
+			throw error;
+		}
+
+		return data;
+	}
+
+	return useMutation({ mutationFn: insertReview });
+}
+
 export default supabase;
-export { useUser, useReviews };
+export { useUser, useReviews, addReview };
