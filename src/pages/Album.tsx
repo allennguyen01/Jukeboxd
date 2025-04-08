@@ -298,15 +298,12 @@ function TracksTable({
 	tracks: SpotifyApi.TrackObjectSimplified[];
 }) {
 	const [expanded, setExpanded] = useState(false);
-	const tableRef = useRef<HTMLTableElement>(null);
-	const isTableTooTall = tableRef.current?.clientHeight ?? 0 > 400;
+	const tooManyTracks = tracks.length > 10;
+	const visibleTracks = expanded ? tracks : tracks.slice(0, 10);
 
 	return (
 		<>
-			<Table
-				className={`w-full ${expanded ? '' : 'inline-block max-h-96 overflow-hidden'}`}
-				ref={tableRef}
-			>
+			<Table>
 				<TableHeader>
 					<TableRow className='border-neutral-600'>
 						<TableHead>#</TableHead>
@@ -318,7 +315,7 @@ function TracksTable({
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{tracks.map((track) => (
+					{visibleTracks.map((track) => (
 						<TableRow
 							key={track.id}
 							className='border-0'
@@ -335,26 +332,15 @@ function TracksTable({
 					))}
 				</TableBody>
 			</Table>
-			{isTableTooTall && !expanded && (
+			{(tooManyTracks || expanded) && (
 				<Button
 					variant='ghost'
 					size='sm'
 					className='w-full rounded-sm border border-neutral-600'
 					onClick={() => setExpanded(!expanded)}
 				>
-					View More
-					<ChevronDown size={16} />
-				</Button>
-			)}
-			{expanded && (
-				<Button
-					variant='ghost'
-					size='sm'
-					className='w-full rounded-sm border border-neutral-600'
-					onClick={() => setExpanded(!expanded)}
-				>
-					View Less
-					<ChevronUp size={16} />
+					{expanded ? 'View Less' : 'View More'}
+					{expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
 				</Button>
 			)}
 		</>
