@@ -22,7 +22,7 @@ function useUser() {
 }
 
 function useReviews() {
-	async function getReviews() {
+	async function getReviews(): Promise<AlbumReview[]> {
 		const { data: reviews, error } = await supabase
 			.from('reviews')
 			.select()
