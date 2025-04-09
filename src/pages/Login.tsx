@@ -1,5 +1,13 @@
 import SignUpModal from '@/components/SignUpModal';
 import HeaderDivider from '@/components/typography/HeaderDivider';
+import {
+	Eye,
+	Calendar,
+	Heart,
+	NotebookText,
+	Star,
+	TableProperties,
+} from 'lucide-react';
 
 export default function Landing() {
 	return (
@@ -50,9 +58,11 @@ function JukeboxdLetsYou() {
 	function Card({
 		text,
 		color,
+		icon,
 	}: {
 		text: string;
 		color: 'primary' | 'secondary' | 'accent';
+		icon: JSX.Element;
 	}) {
 		const backgroundColors = {
 			primary: 'hover:bg-primary-500',
@@ -62,9 +72,10 @@ function JukeboxdLetsYou() {
 
 		return (
 			<div
-				className={`rounded-sm bg-slate-600 p-4 text-slate-100 ${backgroundColors[color]}`}
+				className={`flex items-center justify-between gap-4 rounded-sm bg-slate-600 px-4 py-2 text-base text-slate-100 ${backgroundColors[color]}`}
 			>
-				{text}
+				{icon}
+				<p>{text}</p>
 			</div>
 		);
 	}
@@ -77,30 +88,36 @@ function JukeboxdLetsYou() {
 					text="Keep track of every album you've ever listened (or just start from the
 					day you join)"
 					color='primary'
+					icon={<Eye size={100} />}
 				/>
 				<Card
 					text='Show some love for your favourite albums, playlists, and reviews with
 					a "like"'
 					color='secondary'
+					icon={<Heart size={100} />}
 				/>
 				<Card
 					text='Write and share reviews and follow friends and other members to read
 					theirs'
 					color='accent'
+					icon={<NotebookText size={100} />}
 				/>
 				<Card
 					text='Rate each album on a five-start scale (with halves) to record and share
 					your reaction'
 					color='primary'
+					icon={<Star size={100} />}
 				/>
 				<Card
 					text='Keep a diary of your film watching and look back on what you felt about that album'
 					color='secondary'
+					icon={<Calendar size={100} />}
 				/>
 				<Card
 					text='Compile and share lists of albums on any genre and keep a watch list of
 					albums to listen to'
 					color='accent'
+					icon={<TableProperties size={100} />}
 				/>
 			</div>
 		</section>
