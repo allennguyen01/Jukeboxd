@@ -5,4 +5,5 @@ export type AlbumReview = {
 	album_name: string;
 	rating: number;
 	review: string;
+	listened: boolean;
 };
