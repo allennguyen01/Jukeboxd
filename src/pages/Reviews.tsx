@@ -2,6 +2,7 @@ import { useAlbum } from '@/config/spotifyClient';
 import { useReviews } from '../config/supabaseClient';
 import ReviewRatingStars from '@/components/ReviewRatingStars';
 import { AlbumReview } from '@/types/supabaseTypes';
+import { useNavigate } from 'react-router-dom';
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
@@ -15,11 +16,7 @@ export default function Reviews() {
 				{reviews.map((ar: AlbumReview) => (
 					<AlbumReviewCard
 						key={ar.id}
-						albumID={ar.id}
-						albumName={ar.album_name}
-						createDate={ar.created_at}
-						rating={ar.rating}
-						review={ar.review}
+						albumReview={ar}
 					/>
 				))}
 			</div>
@@ -27,35 +24,29 @@ export default function Reviews() {
 	);
 }
 
-type AlbumReviewCardProps = {
-	albumID: string;
-	albumName: string;
-	createDate: Date;
-	rating: number;
-	review: string;
-};
+function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
+	const navigate = useNavigate();
+	const {
+		id,
+		album_name: albumName,
+		created_at: createDate,
+		rating,
+		review,
+	} = albumReview;
 
-function AlbumReviewCard({
-	albumID,
-	albumName,
-	createDate,
-	rating,
-	review,
-}: AlbumReviewCardProps) {
-	const { isPending, isError, error, data: album } = useAlbum(albumID);
+	const { isPending, isError, error, data: album } = useAlbum(id);
 
 	if (isPending) return <div>Loading...</div>;
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
 		<div className='card card-side gap-4 rounded-none border-b-[1px] border-neutral-600 pb-4'>
-			<figure className='flex-none self-start'>
-				<img
-					src={album.images[0].url}
-					alt={`${albumName} album cover`}
-					className='size-28 rounded-sm'
-				/>
-			</figure>
+			<img
+				src={album.images[0].url}
+				alt={`${albumName} album cover`}
+				className='box-border size-28 rounded-sm transition duration-150 hover:cursor-pointer hover:shadow-white'
+				onClick={() => navigate(`/album/${id}`)}
+			/>
 			<div className='card-body overflow-hidden text-ellipsis p-0'>
 				<h2 className='card-title items-baseline font-semibold text-white'>
 					{albumName}
