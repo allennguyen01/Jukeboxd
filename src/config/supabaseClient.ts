@@ -39,24 +39,20 @@ function useReviews() {
 	});
 }
 
-function addReview(
-	albumReview: Pick<AlbumReview, 'id' | 'album_name' | 'rating' | 'review'>,
-) {
-	async function insertReview() {
+function useUpsertReview() {
+	async function upsertReview(reviewData: Omit<AlbumReview, 'created_at'>) {
 		const { data, error } = await supabase
 			.from('reviews')
-			.insert([albumReview])
+			.upsert([reviewData], { onConflict: 'id, user_id' })
 			.select();
 
-		if (error) {
-			throw error;
-		}
+		if (error) throw error;
 
 		return data;
 	}
 
-	return useMutation({ mutationFn: insertReview });
+	return useMutation({ mutationFn: upsertReview });
 }
 
 export default supabase;
-export { useUser, useReviews, addReview };
+export { useUser, useReviews, useUpsertReview };

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import spotifyClient, { useAlbumGenres } from '@/config/spotifyClient';
-import supabase, { useUser } from '@/config/supabaseClient';
+import { useUpsertReview, useUser } from '@/config/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
 import {
@@ -131,40 +131,37 @@ function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 	const [listened, setListened] = useState(false);
 	const [formError, setFormError] = useState<string | null>('');
 	const [formSuccess, setFormSuccess] = useState<string | null>('');
+	const { mutate: upsertReview } = useUpsertReview();
 
 	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
-		const { data, error } = await supabase
-			.from('reviews')
-			.insert([
-				{
-					id: album.id,
-					user_id: user.id,
-					album_name: album.name,
-					rating,
-					review,
-					listened,
+		upsertReview(
+			{
+				id: album.id,
+				user_id: user.id,
+				album_name: album.name,
+				rating,
+				review,
+				listened,
+			},
+			{
+				onSuccess: () => {
+					setFormSuccess('Review saved successfully!');
+					setFormError(null);
 				},
-			])
-			.select();
-
-		if (error) {
-			console.error('Error inserting review:', error);
-			if (error.code === '23505') {
-				setFormError('Review already exists.');
-			} else {
-				setFormError(
-					`Error inserting review. Please try again. Error: ${error.message}`,
-				);
-			}
-			setFormSuccess(null);
-		}
-
-		if (data) {
-			setFormSuccess('Review saved successfully!');
-			setFormError(null);
-		}
+				onError: (error: any) => {
+					if (error.code === '23505') {
+						setFormError('Review already exists.');
+					} else {
+						setFormError(
+							`Error inserting review, please try again. Error: ${error.message}`,
+						);
+					}
+					setFormSuccess(null);
+				},
+			},
+		);
 	}
 
 	return (
