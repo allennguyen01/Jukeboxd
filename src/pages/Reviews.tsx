@@ -1,8 +1,8 @@
 import { useAlbum } from '@/config/spotifyClient';
 import { useReviews } from '../config/supabaseClient';
-import ReviewRatingStars from '@/components/ReviewRatingStars';
 import { AlbumReview } from '@/types/supabaseTypes';
 import { useNavigate } from 'react-router-dom';
+import StarRating from '@/components/StarRating';
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
@@ -56,9 +56,10 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 				</h2>
 
 				<div className='flex items-center gap-2'>
-					<ReviewRatingStars
-						readOnly={true}
-						rating={rating}
+					<StarRating
+						initialRating={rating}
+						size='md'
+						readOnly
 					/>
 					<p className='text-sm'>
 						Reviewed on{' '}
