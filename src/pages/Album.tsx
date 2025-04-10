@@ -3,8 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FormEvent, useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import spotifyClient, { useAlbumGenres } from '@/config/spotifyClient';
-import { useUpsertReview, useUser } from '@/config/supabaseClient';
+import {
+	useUpsertReview,
+	useUser,
+	useReviewByAlbumId,
+} from '@/config/supabaseClient';
 import { User } from '@supabase/supabase-js';
+import { AlbumReview } from '@/types/supabaseTypes';
 
 import {
 	Table,
@@ -104,10 +109,25 @@ export default function Album() {
 }
 
 function YourReview({ album }: { album: AlbumInfo }) {
-	const { isPending, isError, error, data: user } = useUser();
+	const {
+		isPending: isPendingUser,
+		isError: isErrorUser,
+		error: errorUser,
+		data: user,
+	} = useUser();
 
-	if (isPending) return <div>Loading...</div>;
-	if (isError) return <div>Error: {error.message}</div>;
+	const {
+		isPending: isPendingReview,
+		isError: isErrorReview,
+		error: errorReview,
+		data: currentReview,
+	} = useReviewByAlbumId(album.id);
+
+	if (isPendingUser || isPendingReview) {
+		return <div>Loading...</div>;
+	}
+	if (isErrorUser) return <div>Error: {errorUser.message}</div>;
+	if (isErrorReview) return <div>Error: {errorReview.message}</div>;
 
 	if (!user) {
 		return (
@@ -121,14 +141,35 @@ function YourReview({ album }: { album: AlbumInfo }) {
 		<ReviewForm
 			album={album}
 			user={user}
+			albumReview={currentReview}
 		/>
 	);
 }
 
-function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
-	const [review, setReview] = useState('');
-	const [rating, setRating] = useState(0);
-	const [listened, setListened] = useState(false);
+function ReviewForm({
+	album,
+	user,
+	albumReview,
+}: {
+	album: AlbumInfo;
+	user: User;
+	albumReview: AlbumReview | null;
+}) {
+	const {
+		rating: initialRating,
+		review: initialReview,
+		listened: initialListened,
+		created_at: createdAtDate,
+	} = albumReview || {
+		rating: 0,
+		review: '',
+		listened: false,
+		created_at: null,
+	};
+
+	const [review, setReview] = useState(initialReview);
+	const [rating, setRating] = useState(initialRating);
+	const [listened, setListened] = useState(initialListened);
 	const [formError, setFormError] = useState<string | null>('');
 	const [formSuccess, setFormSuccess] = useState<string | null>('');
 	const { mutate: upsertReview } = useUpsertReview();
@@ -170,18 +211,23 @@ function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 			onSubmit={handleSubmit}
 			className='flex flex-col gap-2'
 		>
-			<section className='flex items-center gap-8'>
+			<section className='flex gap-8 py-4'>
 				<ReviewRatingStars
 					required
+					rating={rating}
 					setRating={setRating}
 				/>
 				<IconToggle
 					checked={listened}
 					setChecked={setListened}
 				/>
+				<LastUpdated createdAtDate={createdAtDate} />
 			</section>
 
-			<ReviewTextBox setReview={setReview} />
+			<ReviewTextBox
+				setReview={setReview}
+				review={review}
+			/>
 
 			{formError && <p className='text-red-500'>{formError}</p>}
 			{formSuccess && <p className='text-green-500'>{formSuccess}</p>}
@@ -196,10 +242,29 @@ function ReviewForm({ album, user }: { album: AlbumInfo; user: User }) {
 	);
 }
 
+function LastUpdated({ createdAtDate }: { createdAtDate: Date | null }) {
+	if (!createdAtDate) return null;
+
+	return (
+		<div className='flex flex-col gap-1'>
+			<p>Last updated:</p>
+			<p className='text-sm text-white'>
+				{`${new Date(createdAtDate).toLocaleDateString(undefined, {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric',
+				})}`}
+			</p>
+		</div>
+	);
+}
+
 function ReviewTextBox({
+	review,
 	setReview,
 	required = false,
 }: {
+	review: string;
 	setReview: (review: string) => void;
 	required?: boolean;
 }) {
@@ -211,8 +276,9 @@ function ReviewTextBox({
 			<textarea
 				name='review'
 				required={required}
-				className='textarea textarea-bordered h-24'
+				className='textarea textarea-bordered h-24 text-white'
 				placeholder='Leave a review...'
+				value={review}
 				onChange={(e) => {
 					setReview(e.target.value);
 				}}
