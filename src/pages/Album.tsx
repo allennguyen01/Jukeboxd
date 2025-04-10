@@ -24,7 +24,7 @@ import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import { Button } from '@/components/ui/button';
-import ReviewRatingStars from '@/components/ReviewRatingStars';
+import StarRating from '@/components/StarRating';
 import IconToggle from '@/components/IconToggle';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
@@ -211,9 +211,8 @@ function ReviewForm({
 			onSubmit={handleSubmit}
 			className='flex flex-col gap-2'
 		>
-			<section className='flex gap-8 py-4'>
-				<ReviewRatingStars
-					required
+			<section className='flex h-full items-center gap-8 py-4'>
+				<Rating
 					rating={rating}
 					setRating={setRating}
 				/>
@@ -246,15 +245,33 @@ function LastUpdated({ createdAtDate }: { createdAtDate: Date | null }) {
 	if (!createdAtDate) return null;
 
 	return (
-		<div className='flex flex-col gap-1'>
-			<p>Last updated:</p>
-			<p className='text-sm text-white'>
+		<div className='flex flex-col items-center gap-1'>
+			<p>Last updated</p>
+			<p className='text-white'>
 				{`${new Date(createdAtDate).toLocaleDateString(undefined, {
 					year: 'numeric',
 					month: 'short',
 					day: 'numeric',
 				})}`}
 			</p>
+		</div>
+	);
+}
+
+function Rating({
+	rating,
+	setRating,
+}: {
+	rating: number;
+	setRating: (rating: number) => void;
+}) {
+	return (
+		<div>
+			<p>Rating</p>
+			<StarRating
+				initialRating={rating}
+				onChange={setRating}
+			/>
 		</div>
 	);
 }
