@@ -54,5 +54,26 @@ function useUpsertReview() {
 	return useMutation({ mutationFn: upsertReview });
 }
 
+function useReviewByAlbumId(albumId: string) {
+	async function getReviewByAlbumId(): Promise<AlbumReview | null> {
+		const { data: review, error } = await supabase
+			.from('reviews')
+			.select()
+			.eq('id', albumId)
+			.single();
+
+		if (!review) return null;
+
+		if (error) throw error;
+
+		return review;
+	}
+
+	return useQuery({
+		queryKey: ['reviews', albumId],
+		queryFn: getReviewByAlbumId,
+	});
+}
+
 export default supabase;
-export { useUser, useReviews, useUpsertReview };
+export { useUser, useReviews, useUpsertReview, useReviewByAlbumId };

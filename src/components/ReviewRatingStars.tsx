@@ -14,7 +14,7 @@ export default function ReviewRatingStars({
 	const ratingValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 	return (
-		<div className='flex flex-col gap-1 py-2'>
+		<div className='flex flex-col gap-1'>
 			{!readOnly && <p className='font-normal'>Rating</p>}
 
 			<div className='rating rating-half rating-md'>
