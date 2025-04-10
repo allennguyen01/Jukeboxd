@@ -9,22 +9,23 @@ export default function IconToggle({
 	checked: boolean;
 	setChecked: (checked: boolean) => void;
 }) {
+	function handleToggle() {
+		setChecked(!checked);
+	}
+
 	return (
-		<div className='flex flex-col items-center gap-1'>
+		<div className='flex w-20 flex-col items-center gap-1'>
 			<Toggle
 				aria-checked={checked}
-				onClick={() => {
-					setChecked(!checked);
-				}}
-				className='flex h-min flex-col hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:text-neutral-content'
+				onClick={handleToggle}
+				className='flex h-full flex-col hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:text-neutral-content'
 			>
 				<p className='text-base font-normal'>
 					{!checked ? 'Listen' : 'Listened'}
 				</p>
 				<Ear
-					size={32}
-					className={clsx({
-						'fill-secondary-600 stroke-white': checked,
+					className={clsx('stroke-white', {
+						'fill-secondary-600': checked,
 					})}
 				/>
 			</Toggle>
