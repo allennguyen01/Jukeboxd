@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import spotifyClient from '../config/spotifyClient';
+import spotifyClient, { useAlbumsBySearchQuery } from '../config/spotifyClient';
 
 import {
 	Carousel,
@@ -13,19 +13,12 @@ import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 
 export default function Home() {
-	function filter20Albums(data: SpotifyApi.SearchResponse) {
-		const items = data.tracks?.items;
-		if (!items) return [];
-
-		const itemAlbums = items.map((item) => item.album);
-		const seen = new Set();
-		const itemsFiltered = itemAlbums.filter((album) => {
-			const duplicate = seen.has(album.id);
-			seen.add(album.id);
-			return !duplicate && album.album_type === 'album';
-		});
-		return itemsFiltered.slice(0, 20);
-	}
+	const {
+		isPending: hiphopAlbumsPending,
+		isError: hiphopAlbumsErroring,
+		error: hiphopAlbumsError,
+		data: hiphopAlbums,
+	} = useAlbumsBySearchQuery('genre%3A%22hip+hop%22+year%3A2024', 20);
 
 	function filterNewAlbums(data: SpotifyApi.ListOfNewReleasesResponse) {
 		const newAlbums = data.albums.items;
@@ -41,14 +34,6 @@ export default function Home() {
 			.then((res) => filterNewAlbums(res.data));
 	}
 
-	function getHiphopAlbums() {
-		return spotifyClient
-			.get(
-				'/search?q=genre%3A%22hip+hop%22+year%3A2024&type=track&market=US&limit=50',
-			)
-			.then((res) => filter20Albums(res.data));
-	}
-
 	const {
 		isPending: newAlbumsPending,
 		isError: newAlbumsErroring,
@@ -57,16 +42,6 @@ export default function Home() {
 	} = useQuery({
 		queryKey: ['newAlbums'],
 		queryFn: getNewAlbums,
-	});
-
-	const {
-		isPending: hiphopAlbumsPending,
-		isError: hiphopAlbumsErroring,
-		error: hiphopAlbumsError,
-		data: hiphopAlbums,
-	} = useQuery({
-		queryKey: ['hiphopAlbums'],
-		queryFn: getHiphopAlbums,
 	});
 
 	if (newAlbumsPending || hiphopAlbumsPending) {

@@ -78,6 +78,35 @@ function useAlbumGenres(
 	});
 }
 
+function useAlbumsBySearchQuery(searchQuery: string, limit = 20) {
+	function filterNAlbums(data: SpotifyApi.SearchResponse, n: number) {
+		const items = data.tracks?.items;
+		if (!items) return [];
+
+		const itemAlbums = items.map((item) => item.album);
+		const seen = new Set();
+		const itemsFiltered = itemAlbums.filter((album) => {
+			const duplicate = seen.has(album.id);
+			seen.add(album.id);
+			return !duplicate && album.album_type === 'album';
+		});
+		return itemsFiltered.slice(0, n);
+	}
+
+	async function fetchAlbumsBySearchQuery(query: string, n: number) {
+		const res = await spotifyClient.get(
+			`/search?q=${query}&type=track&market=US&limit=50`,
+		);
+		return filterNAlbums(res.data, n);
+	}
+
+	return useQuery({
+		queryKey: ['spotifyAlbums', searchQuery, limit],
+		queryFn: () => fetchAlbumsBySearchQuery(searchQuery, limit),
+		enabled: !!searchQuery, // only fetch when query is non-empty
+	});
+}
+
 const spotifyClient = await createSpotifyClient();
 export default spotifyClient;
-export { useAlbum, useAlbumGenres };
+export { useAlbum, useAlbumGenres, useAlbumsBySearchQuery };
