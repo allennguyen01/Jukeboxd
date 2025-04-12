@@ -21,20 +21,30 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 ## Tech Stack
 
-- <div style="display:flex;align-items:center;gap:8px;">
-    Frontend:
-    <span>TypeScript</span> <img src="https://github.com/user-attachments/assets/235fa721-76b0-4437-8ade-598baaa1bf93" width="30">
-    <span>React</span> <img src="https://github.com/user-attachments/assets/a6ee1799-0c00-4722-a648-02678e22fa93" width="30">
-    <span>Vite</span> <img src="https://github.com/user-attachments/assets/a768e6b3-29c5-498d-83ae-d5e345fa2679" width="30">
-    <span>Tailwind CSS</span> <img src="https://github.com/user-attachments/assets/0c85a8a3-db4c-45f6-b82b-c33c7183bcef" width="30">
-    <span>shadcn/ui</span> <img src="https://github.com/user-attachments/assets/8ed2d72b-97ed-4925-ad48-268e51079f63" width="30">
-  </div>
+- Frontend: TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Database: Supabase (PostgreSQL Database, Auth)
+- APIs: Spotify
 
-- Datebase: Supabase (PostgreSQL Database, Auth) <img src="https://github.com/user-attachments/assets/6d799136-0f23-48d7-8835-aa0622cb53a9" width="30">
+## Features
+
+- [x] User can register for an account storing their name, email/username and password then login to the app using their credentials
+- [x] User can search up albums that go to their own separate page with details (cover art, artists, producers, release date, tracks in the album, etc.)
+- [x] User has a profile that displays the ratings and reviews they have uploaded
+- [x] User can write a review or rate music on the separate music pages
+
+### Bonus features
+
+- [ ] Users can get personalized recommendations based on their ratings and reviews
+- [ ] Users can like other people's reviews
+- [ ] User can create a post about a song/album with a caption
+- [ ] User can follow other users and see their ratings, reviews, and posts
+- [ ] User can write a comment on posts
+- [ ] User can create a playlist and share that as a post (slide carousel)
 
 ## Getting Started
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/) v18 or higher
 - [pnpm](https://pnpm.io/) used as the package manager
 - [Supabase](https://supabase.com/) project with API key (used for authentication/data storage)
@@ -42,6 +52,7 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 - `.env` file with URLs and API keys (e.g., Supabase, Spotify, etc.)
 
 ### Installation
+
 ```bash
 git clone https://github.com/allennguyen01/Jukeboxd.git
 cd Jukeboxd # change directory to project
@@ -60,18 +71,10 @@ VITE_SPOTIFY_CLIENT_ID=your-client-id
 VITE_SPOTIFY_CLIENT_SECRET=your-client-secret
 ```
 
-## User Stories
+## Contributing
 
-- [x] User can register for an account storing their name, email/username and password then login to the app using their credentials
-- [x] User can search up albums that go to their own separate page with details (cover art, artists, producers, release date, tracks in the album, etc.)
-- [x] User has a profile that displays the ratings and reviews they have uploaded
-- [x] User can write a review or rate music on the separate music pages
-
-### Bonus features
-
-- [ ] User can create a post about a song/album with a caption
-- [ ] User can follow other users and see their posts
-- [ ] User can write a comment on posts
-- [ ] User can create a playlist and share that as a post (slide carousel)
-- [ ] Posts have embedded 30 second song preview
-- [ ] Users can get personalized recommendations based on their ratings and reviews
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -m 'Add feature foo'`)
+4. Push to the feature branch (`git push origin feature/foo`)
+5. Open a pull request
