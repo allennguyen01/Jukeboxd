@@ -1,5 +1,6 @@
 import SignUpModal from '@/components/SignUpModal';
 import HeaderDivider from '@/components/typography/HeaderDivider';
+import CoverLink from '@/components/CoverLink';
 import {
 	Eye,
 	Calendar,
@@ -8,12 +9,14 @@ import {
 	Star,
 	TableProperties,
 } from 'lucide-react';
+import { useAlbumsBySearchQuery } from '@/config/spotifyClient';
 
 export default function Landing() {
 	return (
-		<div className='mb-24 w-full max-w-screen-lg'>
+		<div className='mb-24 flex w-full max-w-screen-lg flex-col gap-5'>
 			<Hero />
 			<JukeboxdLetsYou />
+			<RecentAlbums />
 		</div>
 	);
 }
@@ -117,6 +120,40 @@ function JukeboxdLetsYou() {
 					color='accent'
 					icon={<TableProperties size={100} />}
 				/>
+			</div>
+		</section>
+	);
+}
+
+function RecentAlbums() {
+	const {
+		data: newAlbums,
+		isPending,
+		isError,
+		error,
+	} = useAlbumsBySearchQuery('genre:"pop"', 8);
+
+	if (isPending) {
+		return <p>Loading...</p>;
+	}
+
+	if (isError) {
+		return <p>Error loading albums: {error.message}</p>;
+	}
+
+	return (
+		<section>
+			<HeaderDivider
+				text='RECENT ALBUMS'
+				className='mb-4'
+			/>
+			<div className='grid w-full grid-cols-4 justify-items-center gap-4'>
+				{newAlbums.map((a) => (
+					<CoverLink
+						album={a}
+						size={244}
+					/>
+				))}
 			</div>
 		</section>
 	);
