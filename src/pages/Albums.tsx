@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/carousel';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import HeaderDivider from '@/components/typography/HeaderDivider';
+import CoverLink from '@/components/CoverLink';
 
 export default function Home() {
 	const {
@@ -18,7 +19,7 @@ export default function Home() {
 		isError: hiphopAlbumsErroring,
 		error: hiphopAlbumsError,
 		data: hiphopAlbums,
-	} = useAlbumsBySearchQuery('genre%3A%22hip+hop%22+year%3A2024', 20);
+	} = useAlbumsBySearchQuery('genre:"hip hop" year:2024', 20);
 
 	function filterNewAlbums(data: SpotifyApi.ListOfNewReleasesResponse) {
 		const newAlbums = data.albums.items;
@@ -90,12 +91,7 @@ function FourAlbumCarousel({
 						key={album.id}
 						className='flex basis-1/4 flex-col items-center gap-2 py-1 text-center'
 					>
-						<img
-							src={album.images[0].url}
-							alt={album.name}
-							className='box-border h-56 max-w-56 rounded transition duration-150 hover:cursor-pointer hover:shadow-white'
-							onClick={() => navigate(`/album/${album.id}`)}
-						/>
+						<CoverLink album={album} />
 						<div className='inline-flex max-w-56 flex-col overflow-hidden'>
 							<span className='inline-flex gap-1 overflow-hidden font-semibold'>
 								<p className='line-clamp-2'>{album.name}</p>

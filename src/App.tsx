@@ -1,9 +1,9 @@
-import Layout from './pages/Layout';
-import Login from './pages/Login';
-import Albums from './pages/Albums';
-import Album from './pages/Album';
-import SearchResults from './pages/SearchResults';
-import Reviews from './pages/Reviews';
+import Layout from '@/pages/Layout';
+import Landing from '@/pages/Landing';
+import Albums from '@/pages/Albums';
+import Album from '@/pages/Album';
+import SearchResults from '@/pages/SearchResults';
+import Reviews from '@/pages/Reviews';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
 				>
 					<Route
 						index
-						element={<Login />}
+						element={<Landing />}
 					/>
 					<Route
 						path='/search/:searchInput'

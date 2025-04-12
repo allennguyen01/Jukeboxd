@@ -1,4 +1,5 @@
-import TextCollapse from './TextCollapse';
+import CoverLink from '@/components/CoverLink';
+import TextCollapse from '@/components/TextCollapse';
 import SpotifyIconButton from './icon/SpotifyIconButton';
 import spotifyClient from '@/config/spotifyClient';
 import { useQuery } from '@tanstack/react-query';
@@ -8,17 +9,10 @@ type AlbumCardProps = SpotifyApi.AlbumObjectSimplified;
 export default function AlbumCard({ album }: { album: AlbumCardProps }) {
 	return (
 		<div className='flex max-w-5xl gap-8 border-b-[1px] border-neutral-600 pb-4'>
-			<a
-				href={`/album/${album.id}`}
-				className='flex-shrink-0'
-			>
-				<img
-					src={album.images[0].url}
-					alt={`${album.name} album cover`}
-					className='size-28 rounded-sm transition duration-150 hover:cursor-pointer hover:shadow-white'
-				/>
-			</a>
-
+			<CoverLink
+				album={album}
+				size={144}
+			/>
 			<div className='flex flex-col gap-3'>
 				<h2 className='flex items-baseline gap-2'>
 					<a

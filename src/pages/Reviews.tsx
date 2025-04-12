@@ -1,8 +1,8 @@
 import { useAlbum } from '@/config/spotifyClient';
-import { useReviews } from '../config/supabaseClient';
+import { useReviews } from '@/config/supabaseClient';
 import { AlbumReview } from '@/types/supabaseTypes';
-import { useNavigate } from 'react-router-dom';
 import StarRating from '@/components/StarRating';
+import CoverLink from '@/components/CoverLink';
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
@@ -25,7 +25,6 @@ export default function Reviews() {
 }
 
 function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
-	const navigate = useNavigate();
 	const {
 		id,
 		album_name: albumName,
@@ -41,11 +40,9 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 
 	return (
 		<div className='card card-side gap-4 rounded-none border-b-[1px] border-neutral-600 pb-4'>
-			<img
-				src={album.images[0].url}
-				alt={`${albumName} album cover`}
-				className='box-border size-28 rounded-sm transition duration-150 hover:cursor-pointer hover:shadow-white'
-				onClick={() => navigate(`/album/${id}`)}
+			<CoverLink
+				album={album}
+				size={112}
 			/>
 			<div className='card-body overflow-hidden text-ellipsis p-0'>
 				<h2 className='card-title items-baseline font-semibold text-white'>
@@ -54,7 +51,6 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 						{new Date(album.release_date).getFullYear()}
 					</span>
 				</h2>
-
 				<div className='flex items-center gap-2'>
 					<StarRating
 						initialRating={rating}
