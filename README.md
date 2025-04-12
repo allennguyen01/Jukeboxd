@@ -70,3 +70,11 @@ VITE_SUPABASE_API_KEY=your-api-key
 VITE_SPOTIFY_CLIENT_ID=your-client-id
 VITE_SPOTIFY_CLIENT_SECRET=your-client-secret
 ```
+
+## Contributing
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -m 'Add feature foo'`)
+4. Push to the feature branch (`git push origin feature/foo`)
+5. Open a pull request
