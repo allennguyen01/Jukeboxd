@@ -32,14 +32,33 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 - Datebase: Supabase (PostgreSQL Database, Auth) <img src="https://github.com/user-attachments/assets/6d799136-0f23-48d7-8835-aa0622cb53a9" width="30">
 
-## Installation
+## Getting Started
 
-### React Frontend
+### Prerequisites
+- [Node.js](https://nodejs.org/) v18 or higher
+- [pnpm](https://pnpm.io/) used as the package manager
+- [Supabase](https://supabase.com/) project with API key (used for authentication/data storage)
+- [Spotify API](https://developer.spotify.com/) project with client ID and secret (used for getting music metadata)
+- `.env` file with URLs and API keys (e.g., Supabase, Spotify, etc.)
 
-1. `cd` into frontend folder
-2. run `pnpm install` to install dependencies
-3. run `pnpm build` to build for production
-4. run `pnpm preview` to view application in browser
+### Installation
+```bash
+git clone https://github.com/allennguyen01/Jukeboxd.git
+cd Jukeboxd # change directory to project
+pnpm install # install dependencies
+pnpm dev # view application in dev mode
+```
+
+### Environment Variables
+
+Create a `.env` file in the root of the project and add the following:
+
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_API_KEY=your-api-key
+VITE_SPOTIFY_CLIENT_ID=your-client-id
+VITE_SPOTIFY_CLIENT_SECRET=your-client-secret
+```
 
 ## User Stories
 
