@@ -21,21 +21,8 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 ## Tech Stack
 
-- <div style="display:flex;align-items:center;gap:8px;">
-    Frontend:
-    <span>TypeScript</span> <img src="https://github.com/user-attachments/assets/235fa721-76b0-4437-8ade-598baaa1bf93" width="20">,
-    <span>React</span> <img src="https://github.com/user-attachments/assets/a6ee1799-0c00-4722-a648-02678e22fa93" width="20">,
-    <span>Vite</span> <img src="https://github.com/user-attachments/assets/a768e6b3-29c5-498d-83ae-d5e345fa2679" width="20">,
-    <span>Tailwind CSS</span> <img src="https://github.com/user-attachments/assets/0c85a8a3-db4c-45f6-b82b-c33c7183bcef" width="20">,
-    <span>shadcn/ui</span> <img src="https://github.com/user-attachments/assets/8ed2d72b-97ed-4925-ad48-268e51079f63" width="20">,
-    <span>TypeScript</span> <img src="https://github.com/user-attachments/assets/235fa721-76b0-4437-8ade-598baaa1bf93" width="20">,
-    <span>React</span> <img src="https://github.com/user-attachments/assets/a6ee1799-0c00-4722-a648-02678e22fa93" width="20">,
-    <span>Vite</span> <img src="https://github.com/user-attachments/assets/a768e6b3-29c5-498d-83ae-d5e345fa2679" width="20">,
-    <span>Tailwind CSS</span> <img src="https://github.com/user-attachments/assets/0c85a8a3-db4c-45f6-b82b-c33c7183bcef" width="20">,
-    <span>shadcn/ui</span> <img src="https://github.com/user-attachments/assets/8ed2d72b-97ed-4925-ad48-268e51079f63" width="20">,
-  </div>
-
-- Database: Supabase (PostgreSQL Database, Auth) <img src="https://github.com/user-attachments/assets/6d799136-0f23-48d7-8835-aa0622cb53a9" width="20">
+- Frontend: TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Database: Supabase (PostgreSQL Database, Auth)
 - APIs: Spotify
 
 ## Features
