@@ -9,7 +9,7 @@
 
 ## About The Project
 
-https://jukeboxd.netlify.app/
+https://jukeboxd-azure.vercel.app/
 
 Jukeboxd is the ultimate social platform for music lovers and audiophiles. Inspired by the community-driven success of Letterboxd, Jukeboxd offers a space for users to discover, rate, and review albums across all genres. No matter what music you're into, Jukeboxd lets you express your opinions and connect with others who share your taste in music.
 
@@ -17,7 +17,7 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 ## Deployment Status
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/2d2363ae-5599-4c3c-b895-b2e64a3e9f1f/deploy-status)](https://app.netlify.com/sites/jukeboxd/deploys)
+![Vercel Deploy](https://deploy-badge.vercel.app/vercel/jukeboxd-azure)
 
 ## Tech Stack
 
@@ -46,7 +46,7 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 - [x] User can register for an account storing their name, email/username and password then login to the app using their credentials
 - [x] User can search up albums that go to their own separate page with details (cover art, artists, producers, release date, tracks in the album, etc.)
 - [x] User has a profile that displays the ratings and reviews they have uploaded
-- [ ] User can write a review or rate music on the separate music pages
+- [x] User can write a review or rate music on the separate music pages
 
 ### Bonus features
 
