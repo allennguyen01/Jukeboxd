@@ -79,7 +79,10 @@ function useAlbumGenres(
 }
 
 function useAlbumsBySearchQuery(searchQuery: string, limit = 20) {
-	function filterNAlbums(data: SpotifyApi.SearchResponse, n: number) {
+	function filterNAlbums(
+		data: SpotifyApi.SearchResponse,
+		n: number,
+	): SpotifyApi.AlbumObjectSimplified[] {
 		const items = data.tracks?.items;
 		if (!items) return [];
 
