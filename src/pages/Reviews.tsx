@@ -5,12 +5,21 @@ import StarRating from '@/components/StarRating';
 import CoverLink from '@/components/CoverLink';
 import { useQuery } from '@tanstack/react-query';
 import HeaderDivider from '@/components/typography/HeaderDivider';
-import { WandSparkles } from 'lucide-react';
+import { WandSparkles, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { reviewsToString } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
+	const [tasteProfile, setTasteProfile] = useState<string>('');
+	const [reviewsString, setReviewsString] = useState<string>('');
+	const [triggerRecommendations, setTriggerRecommendations] = useState(false);
+	function triggerRecs() {
+		setTriggerRecommendations(true);
+	}
 
 	if (isPending) return <div>Loading...</div>;
 	if (isError) return <div>Error: {error.message}</div>;
@@ -27,8 +36,31 @@ export default function Reviews() {
 						/>
 					}
 				/>
-				<TasteProfile />
+				<TasteProfile
+					setTasteProfile={setTasteProfile}
+					setReviewsString={setReviewsString}
+				/>
 			</div>
+			<section className='flex w-full flex-col gap-1'>
+				<HeaderDivider text='RECOMMENDATIONS' />
+				<div className='flex w-full justify-center'>
+					<Button
+						className='gap-2 text-base'
+						variant='secondary'
+						size='lg'
+						onClick={triggerRecs}
+					>
+						<Sparkles color='#ff2350' />
+						Get AI album recommendations
+					</Button>
+				</div>
+				{triggerRecommendations && (
+					<Recommendations
+						tasteProfile={tasteProfile}
+						reviewsString={reviewsString}
+					/>
+				)}
+			</section>
 			<div className='flex w-full flex-col gap-4'>
 				<HeaderDivider text='RECENT REVIEWS' />
 				{reviews.map((ar: AlbumReview) => (
@@ -90,7 +122,13 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 	);
 }
 
-function TasteProfile() {
+function TasteProfile({
+	setTasteProfile,
+	setReviewsString,
+}: {
+	setTasteProfile: (profile: string) => void;
+	setReviewsString: (reviews: string) => void;
+}) {
 	const { isPending, isError, error, data: reviews } = useReviews();
 
 	if (isPending) return <div>Loading...</div>;
@@ -102,6 +140,12 @@ function TasteProfile() {
 		.sort((a, b) => b.rating - a.rating)
 		.slice(0, 5);
 
+	useEffect(() => {
+		if (reviewsToSummarize) {
+			setReviewsString(reviewsToString(reviewsToSummarize));
+		}
+	}, [reviewsToSummarize]);
+
 	const {
 		isPending: isTastePending,
 		isError: isTasteError,
@@ -111,6 +155,12 @@ function TasteProfile() {
 		queryKey: ['tasteProfile', reviewsToSummarize],
 		queryFn: () => fetchTasteProfile(reviewsToSummarize),
 	});
+
+	useEffect(() => {
+		if (tasteProfile) {
+			setTasteProfile(tasteProfile);
+		}
+	}, [tasteProfile]);
 
 	if (isTastePending)
 		return (
@@ -126,35 +176,121 @@ function TasteProfile() {
 	if (isTasteError)
 		return <div>Error with getting taste profile: {tasteError.message}</div>;
 
-	return <p className='leading-relaxed text-white'>{tasteProfile}</p>;
+	return (
+		<div className='flex flex-col gap-6'>
+			<p className='leading-relaxed text-white'>{tasteProfile}</p>
+		</div>
+	);
+}
+
+function Recommendations({
+	tasteProfile,
+	reviewsString,
+}: {
+	tasteProfile: string;
+	reviewsString: string;
+}) {
+	const {
+		isPending,
+		isError,
+		error,
+		data: recommendations,
+	} = useQuery({
+		queryKey: ['recommendations'],
+		queryFn: () => fetchRecommendations(tasteProfile, reviewsString),
+		enabled: !!tasteProfile && !!reviewsString,
+	});
+
+	if (isPending) return <div>Loading...</div>;
+	if (isError)
+		return <div>Error with getting recommendations: {error.message}</div>;
+
+	if (!recommendations.length) {
+		return null;
+	}
+
+	if (typeof recommendations === 'string') {
+		return <p>{recommendations}</p>;
+	}
+
+	return (
+		<ul className='list-disc'>
+			{recommendations.map((rec, index) => (
+				<li key={index}>
+					{rec.album} by {rec.artist}
+				</li>
+			))}
+		</ul>
+	);
 }
 
 const fetchTasteProfile = async (reviews: AlbumReview[]): Promise<string> => {
-	const reviewsString = reviews
-		.map((review) => {
-			return `Album: ${review.album_name}, Rating: ${review.rating}, Review: ${review.review}`;
-		})
-		.join('\n');
+	const reviewsString = reviewsToString(reviews);
 
 	const promptTaste = `Below are the reviews and ratings for albums a user has listened to:
 ${reviewsString}
 
 Please provide a concise summary of the user's musical tastes and preferences, highlighting key genres, moods, and unique characteristics.`;
 
+	// const response = await fetch('https://api.openai.com/v1/chat/completions', {
+	// 	method: 'POST',
+	// 	headers: {
+	// 		'Content-Type': 'application/json',
+	// 		// TODO: create proxy server to NOT expose API key in production client-side code!
+	// 		Authorization: `Bearer ${OPENAI_API_KEY}`,
+	// 	},
+	// 	body: JSON.stringify({
+	// 		model: 'gpt-4', // You may use "gpt-3.5-turbo" if preferred
+	// 		messages: [{ role: 'user', content: promptTaste }],
+	// 		temperature: 0.5,
+	// 		max_tokens: 150,
+	// 	}),
+	// });
+	// const data = await response.json();
+	// return data.choices[0].message.content;
+
+	return 'The user has a preference for popular music, with a particular liking for pop and R&B. They appreciate high-quality music, often referring to albums as "masterpieces". They have a fondness for live music, as shown by their positive review of a concert. They also value artists from the past, as seen in their praise for Michael Jackson and older Kanye West music. However, they appear to be critical of more recent works by Kanye West. They also show a high regard for SZA, appreciating her contribution to the R&B genre.';
+};
+
+type Recommendation = {
+	album: string;
+	artist: string;
+};
+
+const fetchRecommendations = async (
+	tasteProfile: string,
+	reviews: string,
+): Promise<Recommendation[] | string> => {
+	const promptRec = `Based on the following user taste profile:
+${tasteProfile}
+
+And the following album reviews:
+${reviews}
+
+Please recommend 5 albums that match these tastes, but do not recommend albums that are already in the list above. Return your response in JSON format as an array where each element is an object with keys "album" and "artist".`;
+
 	const response = await fetch('https://api.openai.com/v1/chat/completions', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			// TODO: create proxy server to NOT expose API key in production client-side code!
 			Authorization: `Bearer ${OPENAI_API_KEY}`,
 		},
 		body: JSON.stringify({
-			model: 'gpt-4', // You may use "gpt-3.5-turbo" if preferred
-			messages: [{ role: 'user', content: promptTaste }],
-			temperature: 0.5,
-			max_tokens: 150,
+			model: 'gpt-4',
+			messages: [{ role: 'user', content: promptRec }],
+			temperature: 0.7,
+			max_tokens: 250,
 		}),
 	});
 	const data = await response.json();
-	return data.choices[0].message.content;
+	const content: string = data.choices[0].message.content;
+
+	// Parse the returned JSON; if parsing fails, return the raw content
+	try {
+		const jsonResponse: Recommendation[] = JSON.parse(content);
+		return jsonResponse;
+	} catch (error) {
+		console.error('JSON parsing error:', error);
+		return content;
+	}
 };
