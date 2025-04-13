@@ -3,6 +3,10 @@ import { useReviews } from '@/config/supabaseClient';
 import { AlbumReview } from '@/types/supabaseTypes';
 import StarRating from '@/components/StarRating';
 import CoverLink from '@/components/CoverLink';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export default function Reviews() {
 	const { isPending, isError, error, data: reviews } = useReviews();
@@ -11,8 +15,9 @@ export default function Reviews() {
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
-		<div className='flex flex-col items-center justify-center p-4'>
-			<div className='flex w-[1024px] flex-col gap-4'>
+		<div className='flex w-[1024px] flex-col items-center justify-center p-4'>
+			<Recommendations />
+			<div className='flex w-full flex-col gap-4'>
 				{reviews.map((ar: AlbumReview) => (
 					<AlbumReviewCard
 						key={ar.id}
@@ -71,3 +76,75 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 		</div>
 	);
 }
+
+function Recommendations() {
+	const [tasteProfile, setTasteProfile] = useState<string>('');
+
+	const { isPending, isError, error, data: reviews } = useReviews();
+
+	if (isPending) return <div>Loading...</div>;
+	if (isError) return <div>Error with getting reviews: {error.message}</div>;
+	if (reviews.length < 5) {
+		return <p>Please make more than 5 reviews.</p>;
+	}
+	const reviewsToSummarize = reviews
+		.sort((a, b) => b.rating - a.rating)
+		.slice(0, 5);
+
+	const {
+		isPending: isTastePending,
+		isError: isTasteError,
+		error: tasteError,
+		data: tasteData,
+	} = useQuery({
+		queryKey: ['tasteProfile', reviewsToSummarize],
+		queryFn: () => fetchTasteProfile(reviewsToSummarize),
+	});
+
+	useEffect(() => {
+		if (tasteData) {
+			setTasteProfile(tasteData);
+		}
+	}, [tasteData]);
+
+	if (isTastePending) return <div>Loading...</div>;
+	if (isTasteError)
+		return <div>Error with getting taste profile: {tasteError.message}</div>;
+
+	return (
+		<div>
+			<h2>AI Taste Profile</h2>
+			<p>{tasteProfile}</p>
+		</div>
+	);
+}
+
+const fetchTasteProfile = async (reviews: AlbumReview[]): Promise<string> => {
+	const reviewsString = reviews
+		.map((review) => {
+			return `Album: ${review.album_name}, Rating: ${review.rating}, Review: ${review.review}`;
+		})
+		.join('\n');
+
+	const promptTaste = `Below are the reviews and ratings for albums a user has listened to:
+${reviewsString}
+
+Please provide a concise summary of the user's musical tastes and preferences, highlighting key genres, moods, and unique characteristics.`;
+
+	const response = await fetch('https://api.openai.com/v1/chat/completions', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			// TODO: create proxy server to NOT expose API key in production client-side code!
+			Authorization: `Bearer ${OPENAI_API_KEY}`,
+		},
+		body: JSON.stringify({
+			model: 'gpt-4', // You may use "gpt-3.5-turbo" if preferred
+			messages: [{ role: 'user', content: promptTaste }],
+			temperature: 0.5,
+			max_tokens: 150,
+		}),
+	});
+	const data = await response.json();
+	return data.choices[0].message.content;
+};
