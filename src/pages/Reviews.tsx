@@ -1,4 +1,4 @@
-import { useAlbum } from '@/config/spotifyClient';
+import { useAlbum, useAlbumsBySearchQuery } from '@/config/spotifyClient';
 import { useReviews } from '@/config/supabaseClient';
 import { AlbumReview } from '@/types/supabaseTypes';
 import StarRating from '@/components/StarRating';
@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import {
 	fetchRecommendations,
 	fetchTasteProfile,
+	Recommendation,
 } from '@/services/recommendationsAI';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -45,7 +46,7 @@ export default function Reviews() {
 					setReviewsString={setReviewsString}
 				/>
 			</div>
-			<section className='flex w-full flex-col gap-1'>
+			<section className='flex w-full flex-col gap-4'>
 				<HeaderDivider text='RECOMMENDATIONS' />
 				<div className='flex w-full justify-center'>
 					<Button
@@ -205,7 +206,16 @@ function Recommendations({
 		enabled: !!tasteProfile && !!reviewsString,
 	});
 
-	if (isPending) return <div>Loading...</div>;
+	if (isPending)
+		return (
+			<div className='flex animate-pulse justify-between gap-2'>
+				<div className='size-44 rounded bg-gray-200'></div>
+				<div className='size-44 rounded bg-gray-200'></div>
+				<div className='size-44 rounded bg-gray-200'></div>
+				<div className='size-44 rounded bg-gray-200'></div>
+				<div className='size-44 rounded bg-gray-200'></div>
+			</div>
+		);
 	if (isError)
 		return <div>Error with getting recommendations: {error.message}</div>;
 
@@ -218,12 +228,36 @@ function Recommendations({
 	}
 
 	return (
-		<ul className='list-disc'>
+		<div className='flex w-full justify-between gap-4'>
 			{recommendations.map((rec, index) => (
-				<li key={index}>
-					{rec.album} by {rec.artist}
-				</li>
+				<AlbumRec
+					key={index}
+					{...rec}
+				/>
 			))}
-		</ul>
+		</div>
+	);
+}
+
+function AlbumRec(rec: Recommendation) {
+	const { album, artist } = rec;
+	const query = `album:"${album}" artist:"${artist}"`;
+	const {
+		isLoading,
+		isError,
+		error,
+		data: albumData,
+	} = useAlbumsBySearchQuery(query, 1);
+
+	if (isLoading)
+		return <div className='size-44 animate-pulse rounded bg-gray-200'></div>;
+	if (isError) return <li>Error: {error.message}</li>;
+	if (!albumData) return <li>No album found</li>;
+
+	return (
+		<CoverLink
+			album={albumData[0]}
+			size={176}
+		/>
 	);
 }

@@ -2,6 +2,37 @@ import { openAIConfig } from '@/config/openAI';
 import { reviewsToString } from '@/lib/utils';
 import { AlbumReview } from '@/types/supabaseTypes';
 
+export type Recommendation = {
+	album: string;
+	artist: string;
+};
+
+const exampleTasteProfile =
+	'The user has a preference for popular music, with a particular liking for pop and R&B. They appreciate high-quality music, often referring to albums as "masterpieces". They have a fondness for live music, as shown by their positive review of a concert. They also value artists from the past, as seen in their praise for Michael Jackson and older Kanye West music. However, they appear to be critical of more recent works by Kanye West. They also show a high regard for SZA, appreciating her contribution to the R&B genre.';
+
+const exampleRecommendations = [
+	{
+		album: 'Off the Wall',
+		artist: 'Michael Jackson',
+	},
+	{
+		album: 'The Fame Monster',
+		artist: 'Lady Gaga',
+	},
+	{
+		album: '25',
+		artist: 'Adele',
+	},
+	{
+		album: 'Ctrl',
+		artist: 'SZA',
+	},
+	{
+		album: 'Late Registration',
+		artist: 'Kanye West',
+	},
+];
+
 const fetchTasteProfile = async (reviews: AlbumReview[]): Promise<string> => {
 	const reviewsString = reviewsToString(reviews);
 
@@ -26,13 +57,6 @@ Please provide a concise summary of the user's musical tastes and preferences, h
 	});
 	const data = await response.json();
 	return data.choices[0].message.content;
-
-	// return 'The user has a preference for popular music, with a particular liking for pop and R&B. They appreciate high-quality music, often referring to albums as "masterpieces". They have a fondness for live music, as shown by their positive review of a concert. They also value artists from the past, as seen in their praise for Michael Jackson and older Kanye West music. However, they appear to be critical of more recent works by Kanye West. They also show a high regard for SZA, appreciating her contribution to the R&B genre.';
-};
-
-type Recommendation = {
-	album: string;
-	artist: string;
 };
 
 const fetchRecommendations = async (
@@ -71,29 +95,6 @@ Please recommend 5 albums that match these tastes, but do not recommend albums t
 		console.error('JSON parsing error:', error);
 		return content;
 	}
-
-	// return [
-	// 	{
-	// 		album: 'Off the Wall',
-	// 		artist: 'Michael Jackson',
-	// 	},
-	// 	{
-	// 		album: 'The Fame Monster',
-	// 		artist: 'Lady Gaga',
-	// 	},
-	// 	{
-	// 		album: '25',
-	// 		artist: 'Adele',
-	// 	},
-	// 	{
-	// 		album: 'Ctrl',
-	// 		artist: 'SZA',
-	// 	},
-	// 	{
-	// 		album: 'Late Registration',
-	// 		artist: 'Kanye West',
-	// 	},
-	// ];
 };
 
 export { fetchTasteProfile, fetchRecommendations };
