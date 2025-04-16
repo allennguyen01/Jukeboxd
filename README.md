@@ -11,6 +11,10 @@
 
 https://jukeboxd-azure.vercel.app/
 
+Check out the demo video: 
+
+[![Demo video](https://img.youtube.com/vi/LEP8r1WiNGA/0.jpg)](https://www.youtube.com/watch?v=LEP8r1WiNGA)
+
 Jukeboxd is the ultimate social platform for music lovers and audiophiles. Inspired by the community-driven success of Letterboxd, Jukeboxd offers a space for users to discover, rate, and review albums across all genres. No matter what music you're into, Jukeboxd lets you express your opinions and connect with others who share your taste in music.
 
 Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provides the perfect platform to dive deeper into the world of music, discover new sounds, and share your love of albums with a vibrant community.
