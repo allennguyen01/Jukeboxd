@@ -27,7 +27,7 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 - Frontend: TypeScript, Vite, Tailwind CSS, shadcn/ui
 - Database: Supabase (PostgreSQL Database, Auth)
-- APIs: Spotify
+- APIs: Spotify, OpenAI
 
 ## Features
 
@@ -38,7 +38,7 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 
 ### Bonus features
 
-- [ ] Users can get personalized recommendations based on their ratings and reviews
+- [x] Users can get personalized recommendations based on their ratings and reviews
 - [ ] Users can like other people's reviews
 - [ ] User can create a post about a song/album with a caption
 - [ ] User can follow other users and see their ratings, reviews, and posts
@@ -53,7 +53,8 @@ Whether you're a casual listener or a hardcore music enthusiast, Jukeboxd provid
 - [pnpm](https://pnpm.io/) used as the package manager
 - [Supabase](https://supabase.com/) project with API key (used for authentication/data storage)
 - [Spotify API](https://developer.spotify.com/) project with client ID and secret (used for getting music metadata)
-- `.env` file with URLs and API keys (e.g., Supabase, Spotify, etc.)
+- [OpenAI API](https://platform.openai.com/) project with API key (used for getting AI recommendations)
+- `.env` file with URLs and API keys (Supabase, Spotify, OpenAI, etc.)
 
 ### Installation
 
@@ -73,6 +74,7 @@ VITE_SUPABASE_URL=your-supabase-url
 VITE_SUPABASE_API_KEY=your-api-key
 VITE_SPOTIFY_CLIENT_ID=your-client-id
 VITE_SPOTIFY_CLIENT_SECRET=your-client-secret
+VITE_OPENAI_API_KEY=your-openai-api-key
 ```
 
 ## Contributing
