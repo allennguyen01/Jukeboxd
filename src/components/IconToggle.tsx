@@ -18,7 +18,7 @@ export default function IconToggle({
 			<Toggle
 				aria-checked={checked}
 				onClick={handleToggle}
-				className='flex h-full flex-col hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:text-neutral-content'
+				className='flex h-full flex-col dark:hover:bg-transparent dark:data-[state=on]:bg-transparent dark:data-[state=on]:text-neutral-content'
 			>
 				<p className='text-base font-normal'>
 					{!checked ? 'Listen' : 'Listened'}

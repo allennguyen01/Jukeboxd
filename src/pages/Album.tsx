@@ -26,6 +26,7 @@ import HeaderDivider from '@/components/typography/HeaderDivider';
 import { Button } from '@/components/ui/button';
 import StarRating from '@/components/StarRating';
 import IconToggle from '@/components/IconToggle';
+import { Textarea } from '@/components/ui/textarea';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -61,7 +62,7 @@ export default function Album() {
 				/>
 
 				<SpotifyIconButton
-					size={30}
+					size={50}
 					url={album.external_urls.spotify}
 					className='my-4'
 				/>
@@ -69,7 +70,7 @@ export default function Album() {
 				<InfoTable album={album} />
 			</div>
 
-			<div className='col-span-3 ml-10 flex flex-col gap-4'>
+			<div className='col-span-3 ml-10 flex flex-col gap-8'>
 				<AlbumTitle album={album} />
 
 				<section>
@@ -131,7 +132,7 @@ function YourReview({ album }: { album: AlbumInfo }) {
 
 	if (!user) {
 		return (
-			<Button className='w-full text-slate-400 hover:text-slate-100'>
+			<Button className='w-full'>
 				Sign in to log, rate, or leave a review
 			</Button>
 		);
@@ -231,12 +232,12 @@ function ReviewForm({
 			{formError && <p className='text-red-500'>{formError}</p>}
 			{formSuccess && <p className='text-green-500'>{formSuccess}</p>}
 
-			<button
-				className='btn mt-4'
+			<Button
+				className='mt-4'
 				type='submit'
 			>
 				Save
-			</button>
+			</Button>
 		</form>
 	);
 }
@@ -279,27 +280,25 @@ function Rating({
 function ReviewTextBox({
 	review,
 	setReview,
-	required = false,
 }: {
 	review: string;
 	setReview: (review: string) => void;
-	required?: boolean;
 }) {
 	return (
 		<label className='form-control'>
 			<div className='label px-0 py-2'>
 				<span className='label-text text-base'>Review</span>
 			</div>
-			<textarea
+			<Textarea
 				name='review'
-				required={required}
-				className='textarea textarea-bordered h-24 text-white'
+				required
+				className='text-white dark:bg-transparent'
 				placeholder='Leave a review...'
 				value={review}
 				onChange={(e) => {
 					setReview(e.target.value);
 				}}
-			></textarea>
+			/>
 		</label>
 	);
 }
@@ -327,9 +326,12 @@ function InfoTable({ album }: { album: AlbumInfo }) {
 		<Table>
 			<TableBody>
 				{Object.entries(infoTable).map(([key, value]) => (
-					<TableRow key={key}>
-						<TableCell className='min-w-32 p-0'>{key}</TableCell>
-						<TableCell className='break-words text-white'>{value}</TableCell>
+					<TableRow
+						key={key}
+						className='h-12 rounded-lg'
+					>
+						<TableCell className='min-w-32 break-all p-1'>{key}</TableCell>
+						<TableCell className='break-all text-white'>{value}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
@@ -341,8 +343,8 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 	const navigate = useNavigate();
 
 	return (
-		<section>
-			<h1 className='font-playfair text-2xl font-semibold text-white'>
+		<section className='flex flex-col gap-2'>
+			<h1 className='font-playfair text-4xl font-extrabold text-white'>
 				{album.name}
 			</h1>
 			<p>
