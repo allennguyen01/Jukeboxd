@@ -1,24 +1,14 @@
-import { useState, MouseEvent } from 'react';
+import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaMagnifyingGlass, FaAngleDown } from 'react-icons/fa6';
-import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from '@/components/ui/dialog';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import supabase, { useUser } from '@/config/supabaseClient';
+import AuthDialog from './AuthDialog';
 
 export default function NavBar() {
 	const { data: user } = useUser();
@@ -36,7 +26,7 @@ export default function NavBar() {
 					</button>
 				</NavLink>
 				<div className='flex items-center gap-6'>
-					{user ? <ProfileDropdown /> : <SignInDialog />}
+					{user ? <ProfileDropdown /> : <AuthDialog />}
 					<NavLink
 						to='/albums'
 						className='text-sm font-semibold text-neutral-300 hover:text-white'
@@ -93,113 +83,6 @@ function SearchBox() {
 				<FaMagnifyingGlass />
 			</button>
 		</div>
-	);
-}
-
-function SignInDialog() {
-	const [email, setEmail] = useState<string>('');
-	const [password, setPassword] = useState<string>('');
-	const [formFeedback, setFormFeedback] = useState<{
-		error: string;
-		success: string;
-	}>({
-		error: '',
-		success: '',
-	});
-
-	const handleSignIn = async (e: MouseEvent<HTMLButtonElement>) => {
-		e.preventDefault();
-
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
-
-		if (error) {
-			console.error('Sign in error:', error.message);
-			setFormFeedback({ error: error.message, success: '' });
-			return;
-		}
-
-		if (data) {
-			setFormFeedback({ error: '', success: 'Signed in successfully!' });
-			window.location.reload();
-		}
-	};
-
-	const inputs = [
-		{
-			label: 'Email',
-			type: 'email',
-			id: 'email',
-		},
-		{
-			label: 'Password',
-			type: 'password',
-			id: 'password',
-		},
-	];
-
-	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button
-					className='p-4 text-neutral-300 hover:bg-transparent hover:text-white'
-					variant='ghost'
-				>
-					SIGN IN
-				</Button>
-			</DialogTrigger>
-			<DialogContent
-				className='border-0 sm:max-w-[425px]'
-				aria-describedby='Sign in form'
-			>
-				<DialogHeader>
-					<DialogTitle className='font-light'>SIGN IN TO JUKEBOXD</DialogTitle>
-				</DialogHeader>
-				<div className='grid gap-4 py-4'>
-					{inputs.map(({ label, type, id }) => (
-						<div
-							key={label}
-							className='flex flex-col gap-2'
-						>
-							<Label
-								htmlFor={id}
-								className='font-normal text-white'
-							>
-								{label}
-							</Label>
-							<Input
-								id={id}
-								type={type}
-								onChange={(e) =>
-									label === 'Email'
-										? setEmail(e.target.value)
-										: setPassword(e.target.value)
-								}
-								className='focus:border-1 col-span-3 rounded-sm bg-slate-300 text-slate-600 focus:bg-white focus:text-black'
-							/>
-						</div>
-					))}
-
-					{formFeedback.error && (
-						<p className='text-red-500'>{formFeedback.error}</p>
-					)}
-					{formFeedback.success && (
-						<p className='text-green-500'>{formFeedback.success}</p>
-					)}
-				</div>
-				<DialogFooter>
-					<Button
-						type='submit'
-						className='h-8 rounded-sm bg-primary-600 py-2 font-semibold hover:bg-primary-800'
-						onClick={handleSignIn}
-					>
-						SIGN IN
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
 	);
 }
 
