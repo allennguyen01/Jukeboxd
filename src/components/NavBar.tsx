@@ -143,12 +143,15 @@ function SignInDialog() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className='p-0 text-neutral-300 hover:text-white'>
+				<Button
+					className='p-4 text-neutral-300 hover:bg-transparent hover:text-white'
+					variant='ghost'
+				>
 					SIGN IN
 				</Button>
 			</DialogTrigger>
 			<DialogContent
-				className='border-0 bg-slate-700 sm:max-w-[425px]'
+				className='border-0 sm:max-w-[425px]'
 				aria-describedby='Sign in form'
 			>
 				<DialogHeader>
