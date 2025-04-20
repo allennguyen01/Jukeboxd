@@ -279,27 +279,25 @@ function Rating({
 function ReviewTextBox({
 	review,
 	setReview,
-	required = false,
 }: {
 	review: string;
 	setReview: (review: string) => void;
-	required?: boolean;
 }) {
 	return (
 		<label className='form-control'>
 			<div className='label px-0 py-2'>
 				<span className='label-text text-base'>Review</span>
 			</div>
-			<textarea
+			<Textarea
 				name='review'
-				required={required}
-				className='textarea textarea-bordered h-24 text-white'
+				required
+				className='dark:bg-transparent'
 				placeholder='Leave a review...'
 				value={review}
 				onChange={(e) => {
 					setReview(e.target.value);
 				}}
-			></textarea>
+			/>
 		</label>
 	);
 }
