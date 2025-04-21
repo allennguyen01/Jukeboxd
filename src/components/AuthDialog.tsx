@@ -207,7 +207,7 @@ function CreateAccountForm() {
 					JOIN JUKEBOXD
 				</DialogTitle>
 				<DialogDescription className='text-sm dark:text-slate-300'>
-					Enter your email, username, and password to create an account.
+					Enter your email and password to create an account.
 				</DialogDescription>
 			</DialogHeader>
 			<form
