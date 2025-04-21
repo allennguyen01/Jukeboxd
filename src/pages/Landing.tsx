@@ -150,6 +150,7 @@ function RecentAlbums() {
 			<div className='grid w-full grid-cols-4 justify-items-center gap-4'>
 				{newAlbums.map((a) => (
 					<CoverLink
+						key={a.id}
 						album={a}
 						size={244}
 					/>
