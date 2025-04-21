@@ -1,5 +1,6 @@
-import SignUpModal from '@/components/SignUpModal';
+import AuthDialog from '@/components/AuthDialog';
 import HeaderDivider from '@/components/typography/HeaderDivider';
+import { Button } from '@/components/ui/button';
 import CoverLink from '@/components/CoverLink';
 import {
 	Eye,
@@ -22,10 +23,6 @@ export default function Landing() {
 }
 
 function Hero() {
-	function openSignUpModal() {
-		(document.getElementById('sign-up-modal') as HTMLDialogElement).showModal();
-	}
-
 	return (
 		<div
 			className='blurred-edges hero h-[600px] max-w-screen-xl'
@@ -43,14 +40,17 @@ function Hero() {
 					<br />
 					Tell your friends what&apos;s good.
 				</p>
-				<button
-					className='btn btn-primary btn-wide text-lg font-semibold text-white'
-					onClick={openSignUpModal}
-				>
-					Get started — it&apos;s free!
-				</button>
+				<AuthDialog
+					TriggerButton={
+						<Button
+							size='lg'
+							className='text-lg font-semibold dark:bg-primary-600 dark:text-white dark:hover:bg-primary-800'
+						>
+							Get started — it&apos;s free!
+						</Button>
+					}
+				/>
 			</div>
-			<SignUpModal />
 		</div>
 	);
 }
@@ -150,6 +150,7 @@ function RecentAlbums() {
 			<div className='grid w-full grid-cols-4 justify-items-center gap-4'>
 				{newAlbums.map((a) => (
 					<CoverLink
+						key={a.id}
 						album={a}
 						size={244}
 					/>
