@@ -23,3 +23,19 @@ export default function CoverLink({
 		/>
 	);
 }
+
+export function CoverLinkSkeletons({
+	size = 224,
+	number = 4,
+}: {
+	size?: number;
+	number?: number;
+}) {
+	return Array.from({ length: number }).map((_, i) => (
+		<div
+			key={i}
+			className='animate-pulse rounded bg-slate-700'
+			style={{ width: size, height: size }}
+		/>
+	));
+}
