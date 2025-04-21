@@ -20,7 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { cn, decadeToRange } from '@/lib/utils';
 import { useState } from 'react';
 
 export default function Home() {
@@ -32,48 +32,78 @@ export default function Home() {
 	);
 }
 
+const availableGenres = [
+	'classical',
+	'country',
+	'electronic',
+	'folk',
+	'indie',
+	'hip-hop',
+	'jazz',
+	'pop',
+	'rock',
+	'r&b',
+];
+
+const availableYears = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950].map(
+	decadeToRange,
+);
+
 function BrowseAlbums() {
 	const [selectedGenre, setSelectedGenre] = useState('');
+	const [selectedYearRange, setSelectedYearRange] = useState('');
 	const handleGenreChange = (value: string) => {
 		setSelectedGenre(value);
+	};
+	const handleYearRangeChange = (value: string) => {
+		setSelectedYearRange(value);
 	};
 
 	return (
 		<>
 			<div className='mx-3 mb-2 flex items-center gap-4 border-b border-b-slate-500 pb-2'>
 				<p>BROWSE BY...</p>
-				<div>
+				<div className='flex gap-2'>
 					<AlbumSelect
 						placeholder='GENRE'
-						items={[
-							'classical',
-							'country',
-							'electronic',
-							'folk',
-							'indie',
-							'hip-hop',
-							'jazz',
-							'pop',
-							'rock',
-							'r&b',
-						]}
+						items={availableGenres}
 						value={selectedGenre}
 						onValueChange={handleGenreChange}
 					/>
+					<AlbumSelect
+						placeholder='YEAR'
+						items={availableYears}
+						value={selectedYearRange}
+						onValueChange={handleYearRangeChange}
+						className='w-32'
+					/>
 				</div>
 			</div>
-			<BrowseAlbumCarousel genre={selectedGenre} />
+			<BrowseAlbumCarousel
+				genre={selectedGenre}
+				year={selectedYearRange}
+			/>
 		</>
 	);
 }
 
-function BrowseAlbumCarousel({ genre }: { genre: string }) {
+function BrowseAlbumCarousel({
+	genre,
+	year,
+}: {
+	genre?: string;
+	year?: string;
+}) {
+	const genreQuery = genre ? `genre:"${genre}"` : '';
+	const yearQuery = year ? `year:${year}` : '';
+	const query = `${genreQuery} ${yearQuery}`.trim();
+
 	const {
 		isPending,
 		isError,
 		error,
 		data: albums,
-	} = useAlbumsBySearchQuery(`genre:"${genre}"`, 20);
+	} = useAlbumsBySearchQuery(query, 20);
 
 	if (isError) {
 		return <p>Error loading hip hop albums: {error.message}</p>;
