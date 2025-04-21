@@ -1,14 +1,52 @@
 import { useAlbum } from '@/config/spotifyClient';
-import { useReviews } from '@/config/supabaseClient';
+import { useReviews, useUser } from '@/config/supabaseClient';
 import { AlbumReview } from '@/types/supabaseTypes';
 import StarRating from '@/components/StarRating';
 import CoverLink from '@/components/CoverLink';
+import { Eye, SearchSlash, UserSearch } from 'lucide-react';
 
 export default function Reviews() {
-	const { isPending, isError, error, data: reviews } = useReviews();
+	const {
+		isPending: isPendingUser,
+		isError: isErrorUser,
+		error: userError,
+		data: user,
+	} = useUser();
+	const {
+		isPending: isPendingReview,
+		isError: isErrorReview,
+		error: errorReview,
+		data: reviews,
+	} = useReviews();
 
-	if (isPending) return <div>Loading...</div>;
-	if (isError) return <div>Error: {error.message}</div>;
+	if (isPendingReview || isPendingUser) return <div>Loading...</div>;
+	if (isErrorUser) return <div>Error: {userError.message}</div>;
+	if (isErrorReview) return <div>Error: {errorReview.message}</div>;
+
+	if (!user)
+		return (
+			<div className='flex w-[1024px] flex-col items-center justify-center p-4'>
+				<div className='my-8 flex items-center gap-2'>
+					<UserSearch size={30} />
+					<span className='text-lg'>Please sign in to view your reviews.</span>
+				</div>
+				<AlbumReviewCardSkeletons number={1} />
+			</div>
+		);
+
+	if (!reviews || reviews.length === 0)
+		return (
+			<div className='flex w-[1024px] flex-col items-center justify-center p-4'>
+				<div className='my-8 flex items-center gap-2'>
+					<SearchSlash size={30} />
+					<span className='text-lg'>
+						No reviews found, make your first review by searching in the search
+						bar!
+					</span>
+				</div>
+				<AlbumReviewCardSkeletons />
+			</div>
+		);
 
 	return (
 		<div className='flex flex-col items-center justify-center p-4'>
@@ -39,7 +77,7 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
-		<div className='card card-side gap-4 rounded-none border-b-[1px] border-neutral-600 pb-4'>
+		<div className='card card-side gap-4 border-b-[1px] border-neutral-600 pb-4'>
 			<CoverLink
 				album={album}
 				size={112}
@@ -69,5 +107,25 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 				<p className=''>{review}</p>
 			</div>
 		</div>
+	);
+}
+
+function AlbumReviewCardSkeletons({ number = 3 }: { number?: number }) {
+	return (
+		<>
+			{Array.from({ length: number }).map((_, i) => (
+				<div
+					key={i}
+					className='mb-4 flex w-full gap-4 border-b-[1px] border-neutral-600 pb-4'
+				>
+					<div className='h-28 w-28 flex-shrink-0 animate-pulse rounded bg-slate-700' />
+					<div className='flex w-full flex-col gap-2 p-0'>
+						<div className='h-12 w-1/2 animate-pulse rounded bg-slate-700' />
+						<div className='h-8 w-1/3 animate-pulse rounded bg-slate-700' />
+						<p className='h-full w-full animate-pulse rounded bg-slate-700' />
+					</div>
+				</div>
+			))}
+		</>
 	);
 }
