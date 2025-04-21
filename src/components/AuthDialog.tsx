@@ -14,6 +14,7 @@ import { Label } from './ui/label';
 import { Tabs, TabsTrigger, TabsList, TabsContent } from './ui/tabs';
 import supabase from '@/config/supabaseClient';
 import { cn } from '@/lib/utils';
+import { LoaderCircle, X } from 'lucide-react';
 
 type AuthDialogProps = {
 	TriggerButton: JSX.Element;
@@ -58,12 +59,9 @@ export default function AuthDialog({ TriggerButton }: AuthDialogProps) {
 }
 
 function SignInForm() {
-	const [formFeedback, setFormFeedback] = useState<{
-		error: string;
-		success: string;
-	}>({
-		error: '',
-		success: '',
+	const [formFeedback, setFormFeedback] = useState<FormFeedbackProps>({
+		error: null,
+		success: null,
 	});
 
 	const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
@@ -126,12 +124,10 @@ function SignInForm() {
 					id='password'
 				/>
 
-				{formFeedback.error && (
-					<p className='text-red-500'>{formFeedback.error}</p>
-				)}
-				{formFeedback.success && (
-					<p className='text-green-500'>{formFeedback.success}</p>
-				)}
+				<FormFeedback
+					error={formFeedback.error}
+					success={formFeedback.success}
+				/>
 			</form>
 			<DialogFooter>
 				<Button
@@ -195,7 +191,7 @@ function CreateAccountForm() {
 		if (data.user) {
 			console.log('User inserted:', data);
 			setFormFeedback({
-				success: 'User signed up successfully!',
+				success: 'Account created successfully!',
 				error: null,
 			});
 			setTimeout(() => {
@@ -235,12 +231,10 @@ function CreateAccountForm() {
 					type='password'
 				/>
 
-				{formFeedback.error && (
-					<p className='text-red-500'>{formFeedback.error}</p>
-				)}
-				{formFeedback.success && (
-					<p className='text-green-500'>{formFeedback.success}</p>
-				)}
+				<FormFeedback
+					error={formFeedback.error}
+					success={formFeedback.success}
+				/>
 			</form>
 			<DialogFooter className='flex flex-col items-center justify-center'>
 				<Button
@@ -287,4 +281,31 @@ function AuthInput({ label, type, id }: AuthInputProps) {
 			/>
 		</div>
 	);
+}
+
+type FormFeedbackProps = {
+	error: string | null;
+	success: string | null;
+};
+
+function FormFeedback({ error, success }: FormFeedbackProps) {
+	if (error) {
+		return (
+			<div className='flex items-center gap-2 rounded bg-red-200 p-2 text-red-600'>
+				<X />
+				<p>{error}</p>
+			</div>
+		);
+	}
+
+	if (success) {
+		return (
+			<div className='flex items-center gap-2 rounded bg-green-200 p-2 text-green-600'>
+				<LoaderCircle className='animate-spin' />
+				<p>{success}</p>
+			</div>
+		);
+	}
+
+	return null;
 }
