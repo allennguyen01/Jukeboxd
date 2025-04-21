@@ -10,41 +10,121 @@ import {
 } from '@/components/ui/carousel';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import HeaderDivider from '@/components/typography/HeaderDivider';
-import CoverLink from '@/components/CoverLink';
+import CoverLink, { CoverLinkSkeletons } from '@/components/CoverLink';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 export default function Home() {
 	return (
 		<div className='m-4'>
+			<BrowseAlbums />
 			<NewAlbumReleases />
-			<BrowseAlbumCarousel />
 		</div>
 	);
 }
 
-function BrowseAlbumCarousel() {
+function BrowseAlbums() {
+	const [selectedGenre, setSelectedGenre] = useState('');
+	const handleGenreChange = (value: string) => {
+		setSelectedGenre(value);
+	};
+
+	return (
+		<>
+			<div className='mx-3 mb-2 flex items-center gap-4 border-b border-b-slate-500 pb-2'>
+				<p>BROWSE BY...</p>
+				<div>
+					<AlbumSelect
+						placeholder='GENRE'
+						items={[
+							'classical',
+							'country',
+							'electronic',
+							'folk',
+							'indie',
+							'hip-hop',
+							'jazz',
+							'pop',
+							'rock',
+							'r&b',
+						]}
+						value={selectedGenre}
+						onValueChange={handleGenreChange}
+					/>
+				</div>
+			</div>
+			<BrowseAlbumCarousel genre={selectedGenre} />
+		</>
+	);
+}
+
+function BrowseAlbumCarousel({ genre }: { genre: string }) {
 	const {
 		isPending,
 		isError,
 		error,
 		data: albums,
-	} = useAlbumsBySearchQuery('genre:"hip hop"', 20);
-
-	if (isPending) {
-		return <p>Loading albums...</p>;
-	}
+	} = useAlbumsBySearchQuery(`genre:"${genre}"`, 20);
 
 	if (isError) {
 		return <p>Error loading hip hop albums: {error.message}</p>;
 	}
+	if (isPending || albums.length === 0) {
+		return (
+			<div className='mx-3 mb-28 mt-4 flex justify-between'>
+				<CoverLinkSkeletons />
+			</div>
+		);
+	}
 
+	return <FourAlbumCarousel newAlbums={albums} />;
+}
+
+type AlbumSelectProps = {
+	placeholder: string;
+	items: string[];
+	value: string;
+	onValueChange: (value: string) => void;
+	className?: string;
+};
+
+function AlbumSelect({
+	placeholder,
+	items,
+	value,
+	onValueChange,
+	className = '',
+}: AlbumSelectProps) {
 	return (
-		<>
-			<HeaderDivider
-				text='HIP HOP ALBUMS'
-				className='mx-3 mb-2'
-			/>
-			<FourAlbumCarousel newAlbums={albums} />
-		</>
+		<Select
+			value={value}
+			onValueChange={onValueChange}
+		>
+			<SelectTrigger className={cn('w-28', className)}>
+				<SelectValue placeholder={placeholder} />
+			</SelectTrigger>
+			<SelectContent>
+				<SelectGroup>
+					{items.map((item) => (
+						<SelectItem
+							key={item}
+							value={item}
+						>
+							{item}
+						</SelectItem>
+					))}
+				</SelectGroup>
+			</SelectContent>
+		</Select>
 	);
 }
 
