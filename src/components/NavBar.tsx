@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import supabase, { useUser } from '@/config/supabaseClient';
 import AuthDialog from './AuthDialog';
+import { Button } from './ui/button';
 
 export default function NavBar() {
 	const { data: user } = useUser();
@@ -26,7 +27,20 @@ export default function NavBar() {
 					</button>
 				</NavLink>
 				<div className='flex items-center gap-6'>
-					{user ? <ProfileDropdown /> : <AuthDialog />}
+					{user ? (
+						<ProfileDropdown />
+					) : (
+						<AuthDialog
+							TriggerButton={
+								<Button
+									className='p-4 text-neutral-300 hover:bg-transparent hover:text-white'
+									variant='ghost'
+								>
+									SIGN IN
+								</Button>
+							}
+						/>
+					)}
 					<NavLink
 						to='/albums'
 						className='text-sm font-semibold text-neutral-300 hover:text-white'
