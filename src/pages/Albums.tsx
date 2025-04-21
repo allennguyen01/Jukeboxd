@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import spotifyClient, { useAlbumsBySearchQuery } from '../config/spotifyClient';
 
 import {
@@ -14,13 +13,42 @@ import HeaderDivider from '@/components/typography/HeaderDivider';
 import CoverLink from '@/components/CoverLink';
 
 export default function Home() {
-	const {
-		isPending: hiphopAlbumsPending,
-		isError: hiphopAlbumsErroring,
-		error: hiphopAlbumsError,
-		data: hiphopAlbums,
-	} = useAlbumsBySearchQuery('genre:"hip hop" year:2024', 20);
+	return (
+		<div className='m-4'>
+			<NewAlbumReleases />
+			<BrowseAlbumCarousel />
+		</div>
+	);
+}
 
+function BrowseAlbumCarousel() {
+	const {
+		isPending,
+		isError,
+		error,
+		data: albums,
+	} = useAlbumsBySearchQuery('genre:"hip hop"', 20);
+
+	if (isPending) {
+		return <p>Loading albums...</p>;
+	}
+
+	if (isError) {
+		return <p>Error loading hip hop albums: {error.message}</p>;
+	}
+
+	return (
+		<>
+			<HeaderDivider
+				text='HIP HOP ALBUMS'
+				className='mx-3 mb-2'
+			/>
+			<FourAlbumCarousel newAlbums={albums} />
+		</>
+	);
+}
+
+function NewAlbumReleases() {
 	function filterNewAlbums(data: SpotifyApi.ListOfNewReleasesResponse) {
 		const newAlbums = data.albums.items;
 		const itemsFiltered = newAlbums.filter(
@@ -36,40 +64,30 @@ export default function Home() {
 	}
 
 	const {
-		isPending: newAlbumsPending,
-		isError: newAlbumsErroring,
-		error: newAlbumsError,
+		isPending,
+		isError,
+		error,
 		data: newAlbums,
 	} = useQuery({
 		queryKey: ['newAlbums'],
 		queryFn: getNewAlbums,
 	});
 
-	if (newAlbumsPending || hiphopAlbumsPending) {
+	if (isPending) {
 		return <p>Loading albums...</p>;
 	}
-
-	if (newAlbumsErroring) {
-		return <p>Error loading new albums: {newAlbumsError.message}</p>;
-	}
-
-	if (hiphopAlbumsErroring) {
-		return <p>Error loading hip hop albums: {hiphopAlbumsError.message}</p>;
+	if (isError) {
+		return <p>Error loading new albums: {error.message}</p>;
 	}
 
 	return (
-		<div className='m-4'>
+		<>
 			<HeaderDivider
 				text='NEW ALBUM RELEASES'
 				className='mx-3 mb-2'
 			/>
 			<FourAlbumCarousel newAlbums={newAlbums} />
-			<HeaderDivider
-				text='HIP HOP ALBUMS'
-				className='mx-3 mb-2'
-			/>
-			<FourAlbumCarousel newAlbums={hiphopAlbums} />
-		</div>
+		</>
 	);
 }
 
@@ -78,8 +96,6 @@ function FourAlbumCarousel({
 }: {
 	newAlbums: SpotifyApi.AlbumObjectSimplified[];
 }) {
-	const navigate = useNavigate();
-
 	return (
 		<Carousel
 			className='mb-10 w-full max-w-5xl'
