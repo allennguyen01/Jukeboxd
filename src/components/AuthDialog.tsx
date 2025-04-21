@@ -161,10 +161,19 @@ function CreateAccountForm() {
 		const formData = new FormData(e.currentTarget);
 		const email = formData.get('email')?.toString();
 		const password = formData.get('password')?.toString();
+		const confirmPassword = formData.get('confirm-password')?.toString();
 
 		if (!email || !password) {
 			setFormFeedback({
 				error: 'Please fill in all fields.',
+				success: null,
+			});
+			return;
+		}
+
+		if (password !== confirmPassword) {
+			setFormFeedback({
+				error: 'Passwords do not match.',
 				success: null,
 			});
 			return;
@@ -220,6 +229,11 @@ function CreateAccountForm() {
 					id='password'
 					type='password'
 				/>
+				<AuthInput
+					label='Confirm password'
+					id='confirm-password'
+					type='password'
+				/>
 
 				{formFeedback.error && (
 					<p className='text-red-500'>{formFeedback.error}</p>
@@ -249,9 +263,8 @@ type AuthInputProps = {
 
 function AuthInput({ label, type, id }: AuthInputProps) {
 	const inputWidth: { [key: string]: string } = {
-		'Email address': 'max-w-md',
-		Username: 'max-w-xs',
-		Password: 'max-w-xs',
+		email: 'max-w-md',
+		password: 'max-w-xs',
 	};
 
 	return (
@@ -269,7 +282,7 @@ function AuthInput({ label, type, id }: AuthInputProps) {
 				type={type}
 				className={cn(
 					'w-full rounded-sm text-neutral-700 focus:bg-white dark:bg-slate-200',
-					inputWidth[label],
+					inputWidth[type],
 				)}
 			/>
 		</div>
