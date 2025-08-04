@@ -122,8 +122,8 @@ function ProfileDropdown() {
 				PROFILE <FaAngleDown />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='rounded-sm border-0 bg-slate-400 p-0 text-slate-900'>
-				<DropdownMenuItem className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
-					View Profile
+				<DropdownMenuItem className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
+					<NavLink to='/profile'>Edit profile</NavLink>
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'
