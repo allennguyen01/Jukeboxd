@@ -27,7 +27,6 @@ export default function Home() {
 	return (
 		<div className='m-4'>
 			<BrowseAlbums />
-			<NewAlbumReleases />
 		</div>
 	);
 }
@@ -157,49 +156,6 @@ function AlbumSelect({
 				</SelectGroup>
 			</SelectContent>
 		</Select>
-	);
-}
-
-function NewAlbumReleases() {
-	function filterNewAlbums(data: SpotifyApi.ListOfNewReleasesResponse) {
-		const newAlbums = data.albums.items;
-		const itemsFiltered = newAlbums.filter(
-			(album) => album.album_type === 'album',
-		);
-		return itemsFiltered.slice(0, 20);
-	}
-
-	function getNewAlbums() {
-		return spotifyClient
-			.get('/browse/new-releases?limit=50')
-			.then((res) => filterNewAlbums(res.data));
-	}
-
-	const {
-		isPending,
-		isError,
-		error,
-		data: newAlbums,
-	} = useQuery({
-		queryKey: ['newAlbums'],
-		queryFn: getNewAlbums,
-	});
-
-	if (isPending) {
-		return <p>Loading albums...</p>;
-	}
-	if (isError) {
-		return <p>Error loading new albums: {error.message}</p>;
-	}
-
-	return (
-		<>
-			<HeaderDivider
-				text='NEW ALBUM RELEASES'
-				className='mx-3 mb-2'
-			/>
-			<FourAlbumCarousel newAlbums={newAlbums} />
-		</>
 	);
 }
 
