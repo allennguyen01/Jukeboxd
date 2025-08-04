@@ -50,8 +50,10 @@ const availableYears = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950].map(
 );
 
 function BrowseAlbums() {
-	const [selectedGenre, setSelectedGenre] = useState('');
-	const [selectedYearRange, setSelectedYearRange] = useState('');
+	const [selectedGenre, setSelectedGenre] = useState('pop');
+	const [selectedYearRange, setSelectedYearRange] = useState(
+		decadeToRange(2020),
+	);
 	const handleGenreChange = (value: string) => {
 		setSelectedGenre(value);
 	};
