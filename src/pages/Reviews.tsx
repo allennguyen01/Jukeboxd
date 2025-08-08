@@ -77,7 +77,7 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
-		<div className='card card-side gap-4 border-b-[1px] border-neutral-600 pb-4'>
+		<div className='card card-side gap-4 border-b border-neutral-600 pb-4'>
 			<CoverLink
 				album={album}
 				size={112}
@@ -116,9 +116,9 @@ function AlbumReviewCardSkeletons({ number = 3 }: { number?: number }) {
 			{Array.from({ length: number }).map((_, i) => (
 				<div
 					key={i}
-					className='mb-4 flex w-full gap-4 border-b-[1px] border-neutral-600 pb-4'
+					className='mb-4 flex w-full gap-4 border-b border-neutral-600 pb-4'
 				>
-					<div className='h-28 w-28 flex-shrink-0 animate-pulse rounded bg-slate-700' />
+					<div className='h-28 w-28 shrink-0 animate-pulse rounded bg-slate-700' />
 					<div className='flex w-full flex-col gap-2 p-0'>
 						<div className='h-12 w-1/2 animate-pulse rounded bg-slate-700' />
 						<div className='h-8 w-1/3 animate-pulse rounded bg-slate-700' />

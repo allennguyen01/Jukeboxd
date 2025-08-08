@@ -14,7 +14,7 @@ import { useAlbumsBySearchQuery } from '@/config/spotifyClient';
 
 export default function Landing() {
 	return (
-		<div className='mb-24 flex w-full max-w-screen-lg flex-col gap-5'>
+		<div className='mb-24 flex w-full max-w-(--breakpoint-lg) flex-col gap-5'>
 			<Hero />
 			<JukeboxdLetsYou />
 			<RecentAlbums />
@@ -25,7 +25,7 @@ export default function Landing() {
 function Hero() {
 	return (
 		<div
-			className='blurred-edges hero h-[600px] max-w-screen-xl'
+			className='blurred-edges hero h-[600px] max-w-(--breakpoint-xl)'
 			style={{
 				backgroundImage:
 					'url(https://media.cnn.com/api/v1/images/stellar/prod/130907221429-jukebox-1942.jpg?q=w_3580,h_2340,x_0,y_0,c_fill)',

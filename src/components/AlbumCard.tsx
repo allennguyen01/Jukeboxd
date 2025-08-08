@@ -8,7 +8,7 @@ type AlbumCardProps = SpotifyApi.AlbumObjectSimplified;
 
 export default function AlbumCard({ album }: { album: AlbumCardProps }) {
 	return (
-		<div className='flex max-w-5xl gap-8 border-b-[1px] border-neutral-600 pb-4'>
+		<div className='flex max-w-5xl gap-8 border-b border-neutral-600 pb-4'>
 			<CoverLink
 				album={album}
 				size={144}
