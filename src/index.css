@@ -1,15 +1,82 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer utilities {
-	.blurred-edges {
-		mask-image: radial-gradient(
-			circle,
-			rgba(0, 0, 0, 1) 70%,
-			rgba(0, 0, 0, 0) 100%
-		);
+@plugin 'tailwindcss-animate';
+
+@plugin "daisyui";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--font-playfair: 'Playfair Display', serif;
+	--font-inter: Inter, sans-serif;
+
+	--radius-lg: var(--radius);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 4px);
+
+	--color-primary-50: #fff0f3;
+	--color-primary-100: #ffdde4;
+	--color-primary-200: #ffc0cd;
+	--color-primary-300: #ff94aa;
+	--color-primary-400: #ff577a;
+	--color-primary-500: #ff2350;
+	--color-primary-600: #ff073a;
+	--color-primary-700: #d7002c;
+	--color-primary-800: #b10327;
+	--color-primary-900: #920a26;
+	--color-primary-950: #500010;
+
+	--color-secondary-50: #fcf2ff;
+	--color-secondary-100: #f8e3ff;
+	--color-secondary-200: #f1c6ff;
+	--color-secondary-300: #eb9aff;
+	--color-secondary-400: #e05eff;
+	--color-secondary-500: #ce22ff;
+	--color-secondary-600: #bc13fe;
+	--color-secondary-700: #9900ce;
+	--color-secondary-800: #7e00a8;
+	--color-secondary-900: #6b0788;
+	--color-secondary-950: #48005e;
+
+	--color-accent-50: #fff7ec;
+	--color-accent-100: #ffeed3;
+	--color-accent-200: #ffd9a5;
+	--color-accent-300: #ffbd6d;
+	--color-accent-400: #ff9532;
+	--color-accent-500: #ff760a;
+	--color-accent-600: #ff5c00;
+	--color-accent-700: #cc4102;
+	--color-accent-800: #a1330b;
+	--color-accent-900: #822c0c;
+	--color-accent-950: #461304;
+
+	--shadow-white: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
 	}
+}
+
+@utility blurred-edges {
+	mask-image: radial-gradient(
+		circle,
+		rgba(0, 0, 0, 1) 70%,
+		rgba(0, 0, 0, 0) 100%
+	);
 }
 
 @layer base {

@@ -10,21 +10,25 @@ import {
 import supabase, { useUser } from '@/config/supabaseClient';
 import AuthDialog from './AuthDialog';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 export default function NavBar() {
 	const { data: user } = useUser();
 
 	return (
-		<section className='navbar justify-center bg-zinc-900'>
+		<section className='min-h-18 flex w-full justify-center bg-zinc-900'>
 			<div className='flex w-[1024px] items-center justify-between'>
 				<NavLink to='/'>
-					<button className='btn h-full gap-4 bg-transparent'>
+					<Button
+						variant='ghost'
+						className='h-full gap-4'
+					>
 						<img
 							src='/logo.svg'
 							className='h-10'
 						/>
 						<p className='text-3xl font-bold text-white'>Jukeboxd</p>
-					</button>
+					</Button>
 				</NavLink>
 				<div className='flex items-center gap-6'>
 					{user ? (
@@ -76,11 +80,11 @@ function SearchBox() {
 	}
 
 	return (
-		<div className='join rounded-full'>
-			<input
+		<div className='flex rounded-full'>
+			<Input
 				id='search-input'
 				type='text'
-				className='input join-item input-sm w-24 focus:bg-white focus:text-black md:w-auto'
+				className='w-40 rounded-l-full border-0 focus:bg-white focus:text-black'
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
 						performSearch();
@@ -88,14 +92,15 @@ function SearchBox() {
 				}}
 				onChange={(e) => setSearchInput(e.target.value)}
 			/>
-			<button
-				className='btn join-item btn-sm border-0 focus:bg-white'
+			<Button
+				variant='secondary'
+				className='rounded-r-full border-0 focus:bg-white'
 				onClick={() => {
 					performSearch();
 				}}
 			>
 				<FaMagnifyingGlass />
-			</button>
+			</Button>
 		</div>
 	);
 }
@@ -113,18 +118,18 @@ function ProfileDropdown() {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger className='flex h-8 w-32 items-center justify-center gap-2 rounded p-0 text-sm font-semibold text-neutral-300 hover:text-white data-[state=open]:bg-slate-400 data-[state=open]:text-white'>
+			<DropdownMenuTrigger className='flex h-8 w-28 items-center justify-center gap-2 rounded p-0 text-sm font-semibold text-neutral-300 hover:text-white data-[state=open]:bg-slate-400 data-[state=open]:text-white'>
 				PROFILE <FaAngleDown />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='rounded-sm border-0 bg-slate-400 p-0 text-slate-900'>
-				<DropdownMenuItem className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
-					Edit profile
+				<DropdownMenuItem className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
+					View Profile
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'
+					className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'
 					onClick={handleSignOut}
 				>
-					Sign out
+					Sign Out
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
