@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import StarRating from '@/components/StarRating';
 import IconToggle from '@/components/IconToggle';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -212,7 +213,7 @@ function ReviewForm({
 			onSubmit={handleSubmit}
 			className='flex flex-col gap-2'
 		>
-			<section className='flex h-full items-center gap-8 py-4'>
+			<section className='flex h-full items-center gap-12 py-4'>
 				<Rating
 					rating={rating}
 					setRating={setRating}
@@ -247,8 +248,8 @@ function LastUpdated({ createdAtDate }: { createdAtDate: Date | null }) {
 
 	return (
 		<div className='flex flex-col items-center gap-1'>
-			<p>Last updated</p>
-			<p className='text-white'>
+			<Label className='text-base font-normal'>Last updated</Label>
+			<p className='text-slate-300'>
 				{`${new Date(createdAtDate).toLocaleDateString(undefined, {
 					year: 'numeric',
 					month: 'short',
@@ -268,7 +269,7 @@ function Rating({
 }) {
 	return (
 		<div>
-			<p>Rating</p>
+			<Label className='text-base font-normal'>Rating</Label>
 			<StarRating
 				initialRating={rating}
 				onChange={setRating}
@@ -285,21 +286,19 @@ function ReviewTextBox({
 	setReview: (review: string) => void;
 }) {
 	return (
-		<label className='form-control'>
-			<div className='label px-0 py-2'>
-				<span className='label-text text-base'>Review</span>
-			</div>
+		<div className='flex flex-col gap-1'>
+			<Label className='text-base font-normal'>Review</Label>
 			<Textarea
 				name='review'
 				required
-				className='text-white dark:bg-transparent'
+				className='text-slate-300'
 				placeholder='Leave a review...'
 				value={review}
 				onChange={(e) => {
 					setReview(e.target.value);
 				}}
 			/>
-		</label>
+		</div>
 	);
 }
 
@@ -330,7 +329,7 @@ function InfoTable({ album }: { album: AlbumInfo }) {
 						key={key}
 						className='h-12 rounded-lg'
 					>
-						<TableCell className='min-w-32 break-all p-1'>{key}</TableCell>
+						<TableCell className='min-w-32 p-1 break-all'>{key}</TableCell>
 						<TableCell className='break-all text-white'>{value}</TableCell>
 					</TableRow>
 				))}
@@ -352,7 +351,7 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 				<span className='inline-flex gap-1'>
 					{album.artists.map((artist) => (
 						<a
-							className='underline hover:cursor-pointer hover:text-accent-600'
+							className='hover:text-accent-600 underline hover:cursor-pointer'
 							key={artist.id}
 							onClick={() => navigate(`/artist/${artist.id}`)}
 						>
