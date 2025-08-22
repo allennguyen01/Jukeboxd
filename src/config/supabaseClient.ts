@@ -75,5 +75,36 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
+function useProfileInfoById() {
+	const { data: user } = useUser();
+
+	async function getProfileInfo() {
+		if (!user?.id) throw new Error('User not authenticated');
+
+		const { data: profile, error } = await supabase
+			.from('profiles')
+			.select()
+			.eq('id', user.id)
+			.limit(1)
+			.single();
+
+		if (error) throw error;
+
+		return profile;
+	}
+
+	return useQuery({
+		queryKey: ['profile', user?.id],
+		queryFn: getProfileInfo,
+		enabled: !!user?.id, // Only run the query when user ID is available
+	});
+}
+
 export default supabase;
-export { useUser, useReviews, useUpsertReview, useReviewByAlbumId };
+export {
+	useUser,
+	useReviews,
+	useUpsertReview,
+	useReviewByAlbumId,
+	useProfileInfoById,
+};

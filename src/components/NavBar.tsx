@@ -7,7 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import supabase, { useUser } from '@/config/supabaseClient';
+import supabase, { useUser, useProfileInfoById } from '@/config/supabaseClient';
 import AuthDialog from './AuthDialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -16,7 +16,7 @@ export default function NavBar() {
 	const { data: user } = useUser();
 
 	return (
-		<section className='min-h-18 flex w-full justify-center bg-zinc-900'>
+		<section className='flex min-h-18 w-full justify-center bg-zinc-900'>
 			<div className='flex w-[1024px] items-center justify-between'>
 				<NavLink to='/'>
 					<Button
@@ -105,26 +105,39 @@ function SearchBox() {
 	);
 }
 
-function ProfileDropdown() {
-	async function handleSignOut() {
-		const { error } = await supabase.auth.signOut();
-		if (error) {
-			console.error('Sign out error:', error.message);
-			return;
-		}
+async function handleSignOut() {
+	const { error } = await supabase.auth.signOut();
+	if (error) {
+		console.error('Sign out error:', error.message);
+		return;
+	}
 
-		window.location.reload();
+	window.location.reload();
+}
+
+function ProfileDropdown() {
+	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
+	const { username } = userData || {};
+
+	if (isLoadingUserData) {
+		return (
+			<div className='flex h-8 w-28 animate-pulse items-center justify-center text-sm text-neutral-100'>
+				LOADING...
+			</div>
+		);
 	}
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger className='flex h-8 w-28 items-center justify-center gap-2 rounded p-0 text-sm font-semibold text-neutral-300 hover:text-white data-[state=open]:bg-slate-400 data-[state=open]:text-white'>
-				PROFILE <FaAngleDown />
+			<DropdownMenuTrigger className='flex h-8 items-center justify-center gap-2 rounded px-2 py-0 text-sm font-semibold text-neutral-300 hover:text-white data-[state=open]:bg-slate-400 data-[state=open]:text-white'>
+				{username.toUpperCase()} <FaAngleDown />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='rounded-sm border-0 bg-slate-400 p-0 text-slate-900'>
-				<DropdownMenuItem className='m-0 rounded-none hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
-					<NavLink to='/profile'>Edit profile</NavLink>
-				</DropdownMenuItem>
+			<DropdownMenuContent className='w-full rounded-sm border-0 p-0'>
+				<NavLink to='/profile'>
+					<DropdownMenuItem className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
+						Profile
+					</DropdownMenuItem>
+				</NavLink>
 				<DropdownMenuItem
 					className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'
 					onClick={handleSignOut}
