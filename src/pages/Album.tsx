@@ -169,9 +169,10 @@ function ReviewForm({
 		created_at: null,
 	};
 
-	const [review, setReview] = useState(initialReview);
-	const [rating, setRating] = useState(initialRating);
-	const [listened, setListened] = useState(initialListened);
+	const [review, setReview] = useState<string>(initialReview ?? '');
+	const [rating, setRating] = useState<number>(initialRating ?? 0);
+	const [listened, setListened] = useState<boolean>(initialListened);
+
 	const [formError, setFormError] = useState<string | null>('');
 	const [formSuccess, setFormSuccess] = useState<string | null>('');
 	const { mutate: upsertReview } = useUpsertReview();
@@ -243,19 +244,19 @@ function ReviewForm({
 	);
 }
 
-function LastUpdated({ createdAtDate }: { createdAtDate: Date | null }) {
-	if (!createdAtDate) return null;
+function LastUpdated({ createdAtDate }: { createdAtDate: string | null }) {
+	const formattedDate = createdAtDate
+		? new Date(createdAtDate).toLocaleDateString(undefined, {
+				year: 'numeric',
+				month: 'short',
+				day: 'numeric',
+			})
+		: 'Not available';
 
 	return (
 		<div className='flex flex-col items-center gap-1'>
 			<Label className='text-base font-normal'>Last updated</Label>
-			<p className='text-slate-300'>
-				{`${new Date(createdAtDate).toLocaleDateString(undefined, {
-					year: 'numeric',
-					month: 'short',
-					day: 'numeric',
-				})}`}
-			</p>
+			<p className='text-slate-300'>{formattedDate}</p>
 		</div>
 	);
 }
