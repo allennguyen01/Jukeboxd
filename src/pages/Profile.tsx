@@ -55,7 +55,13 @@ export default function Profile() {
 		);
 	}
 
-	return <ProfileForm userData={userData} />;
+	return (
+		<div className='my-8 flex w-lg flex-col gap-4'>
+			<h1 className='text-2xl font-semibold'>Your Profile</h1>
+			<hr className='border-t border-slate-500'></hr>
+			<ProfileForm userData={userData} />
+		</div>
+	);
 }
 
 function ProfileForm({ userData }: { userData: UserProfile }) {
@@ -94,6 +100,8 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 	const { handleSubmit, control } = form;
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
+		setFormFeedback(null);
+
 		const {
 			username,
 			firstName: first_name,
@@ -137,7 +145,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 			<form
 				key={userData.id} // Ensure the form re-renders when userData changes
 				onSubmit={handleSubmit(onSubmit)}
-				className='m-4 grid w-md grid-cols-2 gap-2 gap-x-4'
+				className='grid grid-cols-2 gap-2 gap-x-4'
 			>
 				<FormField
 					control={control}
@@ -241,7 +249,14 @@ function ProfileInput({
 		<FormItem className={className}>
 			<FormLabel>{label}</FormLabel>
 			<FormControl>
-				{isTextarea ? <Textarea {...field} /> : <Input {...field} />}
+				{isTextarea ? (
+					<Textarea
+						{...field}
+						className='h-48'
+					/>
+				) : (
+					<Input {...field} />
+				)}
 			</FormControl>
 			<FormMessage />
 		</FormItem>
