@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -13,8 +14,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useProfileInfoById } from '@/config/supabaseClient';
+import { useProfileInfoById, useUpsertProfile } from '@/config/supabaseClient';
 import { UserProfile } from '@/types/supabaseTypes';
+import clsx from 'clsx';
 
 const usernameSchema = z
 	.string()
@@ -41,11 +43,10 @@ const formSchema = z.object({
 	email: emptyToNull(z.email()),
 	location: emptyToNull(z.string()),
 	website: emptyToNull(z.url()),
-	bio: emptyToNull(z.string().max(160, 'Bio must be at most 160 characters')),
+	bio: emptyToNull(z.string().max(250, 'Bio must be at most 250 characters')),
 });
 
 export default function Profile() {
-	// You can fetch the user's profile data here and set it as default values
 	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
 
 	if (isLoadingUserData || !userData) {
@@ -58,8 +59,22 @@ export default function Profile() {
 }
 
 function ProfileForm({ userData }: { userData: UserProfile }) {
-	const { username, first_name, last_name, email, location, website, bio } =
-		userData;
+	const { mutate: updateProfile } = useUpsertProfile();
+	const [formFeedback, setFormFeedback] = useState<{
+		message: string;
+		isSuccess: boolean;
+	} | null>(null);
+
+	const {
+		id: currentUserID,
+		username,
+		first_name,
+		last_name,
+		email,
+		location,
+		website,
+		bio,
+	} = userData;
 
 	const defaultValues = {
 		username: username,
@@ -79,9 +94,42 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 	const { handleSubmit, control } = form;
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+		const {
+			username,
+			firstName: first_name,
+			lastName: last_name,
+			email,
+			location,
+			website,
+			bio,
+		} = values;
+
+		const newProfile = {
+			id: currentUserID,
+			username,
+			first_name,
+			last_name,
+			email,
+			location,
+			website,
+			bio,
+		};
+
+		updateProfile(newProfile, {
+			onSuccess: () => {
+				setFormFeedback({
+					message: 'Profile updated successfully!',
+					isSuccess: true,
+				});
+			},
+			onError: (error) => {
+				console.error(error);
+				setFormFeedback({
+					message: `Failed to update profile: ${error.message}`,
+					isSuccess: false,
+				});
+			},
+		});
 	}
 
 	return (
@@ -165,6 +213,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						/>
 					)}
 				/>
+				<ProfileFormFeedback formFeedback={formFeedback} />
 				<Button
 					type='submit'
 					size='sm'
@@ -196,5 +245,24 @@ function ProfileInput({
 			</FormControl>
 			<FormMessage />
 		</FormItem>
+	);
+}
+
+function ProfileFormFeedback({
+	formFeedback,
+}: {
+	formFeedback: { message: string; isSuccess: boolean } | null;
+}) {
+	if (!formFeedback) return null;
+
+	return (
+		<p
+			className={clsx('col-span-2 mt-2 text-sm', {
+				'text-green-500': formFeedback.isSuccess,
+				'text-red-500': !formFeedback.isSuccess,
+			})}
+		>
+			{formFeedback.message}
+		</p>
 	);
 }

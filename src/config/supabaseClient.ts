@@ -1,4 +1,4 @@
-import { AlbumReview } from '@/types/supabaseTypes';
+import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -100,6 +100,21 @@ function useProfileInfoById() {
 	});
 }
 
+function useUpsertProfile() {
+	async function upsertProfile(profileData: Omit<UserProfile, 'created_at'>) {
+		const { data, error } = await supabase
+			.from('profiles')
+			.upsert([profileData], { onConflict: 'id' })
+			.select();
+
+		if (error) throw error;
+
+		return data;
+	}
+
+	return useMutation({ mutationFn: upsertProfile });
+}
+
 export default supabase;
 export {
 	useUser,
@@ -107,4 +122,5 @@ export {
 	useUpsertReview,
 	useReviewByAlbumId,
 	useProfileInfoById,
+	useUpsertProfile,
 };
