@@ -71,6 +71,8 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 		review,
 	} = albumReview;
 
+	const initialRating = rating ?? 0;
+
 	const { isPending, isError, error, data: album } = useAlbum(id);
 
 	if (isPending) return <AlbumReviewCardSkeletons number={1} />;
@@ -82,7 +84,7 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 				album={album}
 				size={112}
 			/>
-			<div className='flex flex-col gap-3 overflow-hidden text-ellipsis p-0'>
+			<div className='flex flex-col gap-3 overflow-hidden p-0 text-ellipsis'>
 				<h2 className='flex items-baseline gap-2'>
 					<span className='text-xl font-semibold text-white'>{albumName}</span>
 					<span className='font-sans text-lg font-thin'>
@@ -91,7 +93,7 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 				</h2>
 				<div className='flex items-center gap-2'>
 					<StarRating
-						initialRating={rating}
+						initialRating={initialRating}
 						size='md'
 						readOnly
 					/>

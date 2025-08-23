@@ -4,6 +4,7 @@ import Albums from '@/pages/Albums';
 import Album from '@/pages/Album';
 import SearchResults from '@/pages/SearchResults';
 import Reviews from '@/pages/Reviews';
+import Profile from '@/pages/Profile';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -33,6 +34,14 @@ function App() {
 					<Route
 						path='/album/:id'
 						element={<Album />}
+					/>
+					<Route
+						path='/profile'
+						element={<Profile />}
+					/>
+					<Route
+						path='*'
+						element={<p>Page not found</p>}
 					/>
 				</Route>
 			</Routes>

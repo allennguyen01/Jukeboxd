@@ -1,6 +1,7 @@
 import { Toggle } from './ui/toggle';
 import { Ear } from 'lucide-react';
 import clsx from 'clsx';
+import { Label } from '@radix-ui/react-dropdown-menu';
 
 export default function IconToggle({
 	checked,
@@ -18,11 +19,11 @@ export default function IconToggle({
 			<Toggle
 				aria-checked={checked}
 				onClick={handleToggle}
-				className='flex h-full flex-col dark:hover:bg-transparent dark:data-[state=on]:bg-transparent dark:data-[state=on]:text-neutral-content'
+				className='dark:data-[state=on]:text-neutral-content flex h-full flex-col dark:hover:bg-transparent dark:data-[state=on]:bg-transparent'
 			>
-				<p className='text-base font-normal'>
+				<Label className='text-base font-medium text-slate-300'>
 					{!checked ? 'Listen' : 'Listened'}
-				</p>
+				</Label>
 				<Ear
 					className={clsx('stroke-white', {
 						'fill-secondary-600': checked,

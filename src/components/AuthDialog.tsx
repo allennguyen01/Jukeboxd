@@ -155,13 +155,22 @@ function CreateAccountForm() {
 		e.preventDefault();
 
 		const formData = new FormData(e.currentTarget);
+		const username = formData.get('username')?.toString();
 		const email = formData.get('email')?.toString();
 		const password = formData.get('password')?.toString();
 		const confirmPassword = formData.get('confirm-password')?.toString();
 
-		if (!email || !password) {
+		if (!username || !email || !password) {
 			setFormFeedback({
 				error: 'Please fill in all fields.',
+				success: null,
+			});
+			return;
+		}
+
+		if (username.length < 3) {
+			setFormFeedback({
+				error: 'Username must be at least 3 characters long.',
 				success: null,
 			});
 			return;
@@ -186,18 +195,39 @@ function CreateAccountForm() {
 				error: `Error signing up. Please try again. Error: ${error.message}`,
 				success: null,
 			});
+			return;
 		}
 
-		if (data.user) {
-			console.log('User inserted:', data);
+		if (!data.user) {
 			setFormFeedback({
-				success: 'Account created successfully!',
-				error: null,
+				error: 'Error signing up. Please try again.',
+				success: null,
 			});
-			setTimeout(() => {
-				window.location.reload();
-			}, 2000);
+			return;
 		}
+
+		const { error: profileError } = await supabase.from('profiles').insert({
+			id: data.user.id,
+			username: username,
+		});
+
+		if (profileError) {
+			console.error('Error inserting profile:', profileError);
+			setFormFeedback({
+				error: `Error creating profile. Please try again. Error: ${profileError.message}`,
+				success: null,
+			});
+			return;
+		}
+
+		setFormFeedback({
+			success: 'Account created successfully!',
+			error: null,
+		});
+
+		setTimeout(() => {
+			window.location.reload();
+		}, 2000);
 	}
 
 	return (
@@ -215,6 +245,11 @@ function CreateAccountForm() {
 				onSubmit={handleSubmit}
 				className='flex flex-col gap-4 py-8'
 			>
+				<AuthInput
+					label='Username'
+					id='username'
+					type='username'
+				/>
 				<AuthInput
 					label='Email address'
 					id='email'
@@ -249,16 +284,19 @@ function CreateAccountForm() {
 	);
 }
 
+type SignUpInputTypes = 'username' | 'email' | 'password';
+
 type AuthInputProps = {
 	label: string;
-	type: string;
+	type: SignUpInputTypes;
 	id: string;
 };
 
 function AuthInput({ label, type, id }: AuthInputProps) {
-	const inputWidth: { [key: string]: string } = {
+	const inputWidth: { [key in SignUpInputTypes]: string } = {
 		email: 'max-w-md',
 		password: 'max-w-xs',
+		username: 'max-w-sm',
 	};
 
 	return (

@@ -1,4 +1,4 @@
-import { AlbumReview } from '@/types/supabaseTypes';
+import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -75,5 +75,52 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
+function useProfileInfoById() {
+	const { data: user } = useUser();
+
+	async function getProfileInfo() {
+		if (!user?.id) throw new Error('User not authenticated');
+
+		const { data: profile, error } = await supabase
+			.from('profiles')
+			.select()
+			.eq('id', user.id)
+			.limit(1)
+			.single();
+
+		if (error) throw error;
+
+		return profile;
+	}
+
+	return useQuery({
+		queryKey: ['profile', user?.id],
+		queryFn: getProfileInfo,
+		enabled: !!user?.id, // Only run the query when user ID is available
+	});
+}
+
+function useUpsertProfile() {
+	async function upsertProfile(profileData: Omit<UserProfile, 'created_at'>) {
+		const { data, error } = await supabase
+			.from('profiles')
+			.upsert([profileData], { onConflict: 'id' })
+			.select();
+
+		if (error) throw error;
+
+		return data;
+	}
+
+	return useMutation({ mutationFn: upsertProfile });
+}
+
 export default supabase;
-export { useUser, useReviews, useUpsertReview, useReviewByAlbumId };
+export {
+	useUser,
+	useReviews,
+	useUpsertReview,
+	useReviewByAlbumId,
+	useProfileInfoById,
+	useUpsertProfile,
+};
