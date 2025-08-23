@@ -13,6 +13,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useProfileInfoById } from '@/config/supabaseClient';
+import { UserProfile } from '@/types/supabaseTypes';
+
 const usernameSchema = z
 	.string()
 	.min(3, 'Username must be at least 3 characters')
@@ -23,28 +26,54 @@ const usernameSchema = z
 		message: 'Username must not contain spaces',
 	});
 
+function emptyToNull<T extends z.ZodTypeAny>(schema: T) {
+	return z.union([z.literal('').transform(() => null), schema.nullable()]);
+}
+
 const formSchema = z.object({
 	username: usernameSchema,
-	firstName: z.string().min(1, 'First name is required'),
-	lastName: z.string().min(1, 'Last name is required'),
-	email: z.email('Invalid email address'),
-	location: z.string().optional(),
-	website: z.url('Invalid URL').optional(),
-	bio: z.string().optional(),
+	firstName: emptyToNull(
+		z.string().max(50, 'First name must be at most 50 characters'),
+	),
+	lastName: emptyToNull(
+		z.string().max(50, 'Last name must be at most 50 characters'),
+	),
+	email: emptyToNull(z.email()),
+	location: emptyToNull(z.string()),
+	website: emptyToNull(z.url()),
+	bio: emptyToNull(z.string().max(160, 'Bio must be at most 160 characters')),
 });
 
 export default function Profile() {
+	// You can fetch the user's profile data here and set it as default values
+	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
+
+	if (isLoadingUserData || !userData) {
+		return (
+			<div className='flex h-full items-center justify-center'>Loading...</div>
+		);
+	}
+
+	return <ProfileForm userData={userData} />;
+}
+
+function ProfileForm({ userData }: { userData: UserProfile }) {
+	const { username, first_name, last_name, email, location, website, bio } =
+		userData;
+
+	const defaultValues = {
+		username: username,
+		firstName: first_name ?? '',
+		lastName: last_name ?? '',
+		email: email ?? '',
+		location: location ?? '',
+		website: website ?? '',
+		bio: bio ?? '',
+	};
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			username: '',
-			firstName: '',
-			lastName: '',
-			email: '',
-			location: '',
-			website: '',
-			bio: '',
-		},
+		defaultValues,
 	});
 
 	const { handleSubmit, control } = form;
@@ -58,8 +87,9 @@ export default function Profile() {
 	return (
 		<Form {...form}>
 			<form
+				key={userData.id} // Ensure the form re-renders when userData changes
 				onSubmit={handleSubmit(onSubmit)}
-				className='m-4 grid w-lg grid-cols-2 gap-2 gap-x-4'
+				className='m-4 grid w-md grid-cols-2 gap-2 gap-x-4'
 			>
 				<FormField
 					control={control}
