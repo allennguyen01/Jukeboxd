@@ -5,6 +5,7 @@ import { AlbumReview } from '@/types/supabaseTypes';
 import StarRating from '@/components/StarRating';
 import CoverLink from '@/components/CoverLink';
 import { SearchSlash, UserSearch } from 'lucide-react';
+import { sortReviews } from '@/lib/helpers/review';
 
 import {
 	Select,
@@ -14,7 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 
-type SortBy =
+export type ReviewsSortBy =
 	| 'date-desc'
 	| 'date-asc'
 	| 'rating-desc'
@@ -35,7 +36,7 @@ export default function Reviews() {
 		data: reviews,
 	} = useReviews();
 
-	const [sortBy, setSortBy] = useState<SortBy>('date-desc');
+	const [sortBy, setSortBy] = useState<ReviewsSortBy>('date-desc');
 
 	if (isPendingReview || isPendingUser) return <div>Loading...</div>;
 	if (isErrorUser) return <div>Error: {userError.message}</div>;
@@ -66,6 +67,8 @@ export default function Reviews() {
 			</div>
 		);
 
+	const sortedReviews = sortReviews(reviews, sortBy);
+
 	return (
 		<div className='flex w-5xl flex-col items-center justify-center p-4'>
 			<div className='flex w-full flex-col'>
@@ -78,7 +81,7 @@ export default function Reviews() {
 				<hr className='mt-2 mb-4 border border-slate-400' />
 			</div>
 			<div className='flex w-full flex-col gap-4'>
-				{reviews.map((ar: AlbumReview) => (
+				{sortedReviews.map((ar: AlbumReview) => (
 					<AlbumReviewCard
 						key={ar.id}
 						albumReview={ar}
@@ -89,7 +92,11 @@ export default function Reviews() {
 	);
 }
 
-function SortByDropdown({ setSortBy }: { setSortBy: (value: SortBy) => void }) {
+function SortByDropdown({
+	setSortBy,
+}: {
+	setSortBy: (value: ReviewsSortBy) => void;
+}) {
 	return (
 		<div className='flex items-center gap-2'>
 			<p className='text-sm text-neutral-400'>Sort by:</p>
