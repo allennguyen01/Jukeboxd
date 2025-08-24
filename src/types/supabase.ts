@@ -77,7 +77,7 @@ export type Database = {
 			};
 			reviews: {
 				Row: {
-					album_name: string | null;
+					album_name: string;
 					created_at: string;
 					id: string;
 					listened: boolean;
@@ -86,7 +86,7 @@ export type Database = {
 					user_id: string;
 				};
 				Insert: {
-					album_name?: string | null;
+					album_name: string;
 					created_at?: string;
 					id: string;
 					listened?: boolean;
@@ -95,7 +95,7 @@ export type Database = {
 					user_id: string;
 				};
 				Update: {
-					album_name?: string | null;
+					album_name?: string;
 					created_at?: string;
 					id?: string;
 					listened?: boolean;
