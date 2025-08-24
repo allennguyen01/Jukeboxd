@@ -1,9 +1,25 @@
+import { useState } from 'react';
 import { useAlbum } from '@/config/spotifyClient';
 import { useReviews, useUser } from '@/config/supabaseClient';
 import { AlbumReview } from '@/types/supabaseTypes';
 import StarRating from '@/components/StarRating';
 import CoverLink from '@/components/CoverLink';
-import { Eye, SearchSlash, UserSearch } from 'lucide-react';
+import { SearchSlash, UserSearch } from 'lucide-react';
+
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+
+type SortBy =
+	| 'date-desc'
+	| 'date-asc'
+	| 'rating-desc'
+	| 'rating-asc'
+	| 'alphabetical';
 
 export default function Reviews() {
 	const {
@@ -18,6 +34,8 @@ export default function Reviews() {
 		error: errorReview,
 		data: reviews,
 	} = useReviews();
+
+	const [sortBy, setSortBy] = useState<SortBy>('date-desc');
 
 	if (isPendingReview || isPendingUser) return <div>Loading...</div>;
 	if (isErrorUser) return <div>Error: {userError.message}</div>;
@@ -49,8 +67,17 @@ export default function Reviews() {
 		);
 
 	return (
-		<div className='flex flex-col items-center justify-center p-4'>
-			<div className='flex w-[1024px] flex-col gap-4'>
+		<div className='flex w-5xl flex-col items-center justify-center p-4'>
+			<div className='flex w-full flex-col'>
+				<div className='flex items-center justify-between'>
+					<h1 className='text-lg font-semibold text-slate-200'>
+						REVIEWS <span className='text-slate-400'>({reviews.length})</span>
+					</h1>
+					<SortByDropdown setSortBy={setSortBy} />
+				</div>
+				<hr className='mt-2 mb-4 border border-slate-400' />
+			</div>
+			<div className='flex w-full flex-col gap-4'>
 				{reviews.map((ar: AlbumReview) => (
 					<AlbumReviewCard
 						key={ar.id}
@@ -58,6 +85,29 @@ export default function Reviews() {
 					/>
 				))}
 			</div>
+		</div>
+	);
+}
+
+function SortByDropdown({ setSortBy }: { setSortBy: (value: SortBy) => void }) {
+	return (
+		<div className='flex items-center gap-2'>
+			<p className='text-sm text-neutral-400'>Sort by:</p>
+			<Select
+				defaultValue='date-desc'
+				onValueChange={setSortBy}
+			>
+				<SelectTrigger className='w-[180px]'>
+					<SelectValue placeholder='Theme' />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value='date-desc'>Newest first</SelectItem>
+					<SelectItem value='date-asc'>Oldest first</SelectItem>
+					<SelectItem value='rating-desc'>Highest rated</SelectItem>
+					<SelectItem value='rating-asc'>Lowest rated</SelectItem>
+					<SelectItem value='alphabetical'>A → Z</SelectItem>
+				</SelectContent>
+			</Select>
 		</div>
 	);
 }
