@@ -8,6 +8,15 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
+import FavoriteAlbumPicker from '@/components/profile/FavoriteAlbumPicker';
+import { PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,10 +65,21 @@ export default function Profile() {
 	}
 
 	return (
-		<div className='my-8 flex w-lg flex-col gap-4'>
+		<div className='my-8 flex w-5xl flex-col gap-4'>
 			<h1 className='text-2xl font-semibold'>Your Profile</h1>
 			<hr className='border-t border-slate-500'></hr>
-			<ProfileForm userData={userData} />
+			<div className='flex justify-between'>
+				<ProfileForm userData={userData} />
+				<div className='flex flex-col gap-2'>
+					<h3 className='text-lg'>Favorite Albums</h3>
+					<div className='grid grid-cols-2 gap-4'>
+						<FavoriteAlbum />
+						<FavoriteAlbum />
+						<FavoriteAlbum />
+						<FavoriteAlbum />
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }
@@ -279,5 +299,21 @@ function ProfileFormFeedback({
 		>
 			{formFeedback.message}
 		</p>
+	);
+}
+
+function FavoriteAlbum() {
+	return (
+		<Dialog>
+			<DialogTrigger className='flex size-[200px] items-center justify-center rounded-lg bg-slate-600 hover:bg-slate-700'>
+				<PlusCircle size={24} />
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Pick a favorite album</DialogTitle>
+				</DialogHeader>
+				<FavoriteAlbumPicker />
+			</DialogContent>
+		</Dialog>
 	);
 }

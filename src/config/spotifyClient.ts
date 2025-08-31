@@ -92,6 +92,7 @@ function useSearchAlbums(searchInput: string) {
 	return useQuery({
 		queryKey: ['search', searchInput],
 		queryFn: search,
+		enabled: !!searchInput,
 	});
 }
 
