@@ -78,6 +78,23 @@ function useAlbumGenres(
 	});
 }
 
+function useSearchAlbums(searchInput: string) {
+	function search(): Promise<SpotifyApi.AlbumObjectSimplified[]> {
+		return spotifyClient
+			.get(`https://api.spotify.com/v1/search?type=album&q=${searchInput}`)
+			.then((res) =>
+				res.data.albums.items.filter(
+					(item: { album_type: string }) => item.album_type === 'album',
+				),
+			);
+	}
+
+	return useQuery({
+		queryKey: ['search', searchInput],
+		queryFn: search,
+	});
+}
+
 function useAlbumsBySearchQuery(searchQuery: string, limit = 20) {
 	function filterNAlbums(
 		data: SpotifyApi.SearchResponse,
@@ -112,4 +129,4 @@ function useAlbumsBySearchQuery(searchQuery: string, limit = 20) {
 
 const spotifyClient = await createSpotifyClient();
 export default spotifyClient;
-export { useAlbum, useAlbumGenres, useAlbumsBySearchQuery };
+export { useAlbum, useAlbumGenres, useSearchAlbums, useAlbumsBySearchQuery };
