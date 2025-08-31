@@ -133,7 +133,7 @@ function SignInForm() {
 				<Button
 					type='submit'
 					form='sign-in'
-					className='w-1/2 rounded-sm py-2 font-semibold dark:bg-primary-600 dark:text-white dark:hover:bg-primary-800'
+					className='dark:bg-primary-600 dark:hover:bg-primary-800 w-1/2 rounded-sm py-2 font-semibold dark:text-white'
 				>
 					SIGN IN
 				</Button>
@@ -271,11 +271,11 @@ function CreateAccountForm() {
 					success={formFeedback.success}
 				/>
 			</form>
-			<DialogFooter className='flex flex-col items-center justify-center'>
+			<DialogFooter>
 				<Button
 					type='submit'
 					form='create-account-form'
-					className='w-1/2 rounded-sm dark:bg-secondary-600 dark:text-white dark:hover:bg-secondary-800'
+					className='dark:bg-secondary-600 dark:hover:bg-secondary-800 w-1/2 rounded-sm dark:text-white'
 				>
 					CREATE ACCOUNT
 				</Button>
