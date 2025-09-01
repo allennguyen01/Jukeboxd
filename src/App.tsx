@@ -4,7 +4,8 @@ import Albums from '@/pages/Albums';
 import Album from '@/pages/Album';
 import SearchResults from '@/pages/SearchResults';
 import Reviews from '@/pages/Reviews';
-import Profile from '@/pages/Profile';
+import Profile from './pages/profile/Profile';
+import ProfileEdit from './pages/profile/ProfileEdit';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -38,6 +39,10 @@ function App() {
 					<Route
 						path='/profile'
 						element={<Profile />}
+					/>
+					<Route
+						path='/profile/edit'
+						element={<ProfileEdit />}
 					/>
 					<Route
 						path='*'

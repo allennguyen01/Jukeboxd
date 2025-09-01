@@ -59,7 +59,7 @@ const formSchema = z.object({
 	bio: emptyToNull(z.string().max(250, 'Bio must be at most 250 characters')),
 });
 
-export default function Profile() {
+export default function ProfileEdit() {
 	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
 
 	if (isLoadingUserData || !userData) {
