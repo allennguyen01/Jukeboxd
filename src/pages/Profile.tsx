@@ -19,13 +19,17 @@ import FavoriteAlbumPicker from '@/components/profile/FavoriteAlbumPicker';
 import { PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import FormFeedback from '@/components/common/FormFeedback';
+
+import {
+	useProfileInfoById,
+	useUpsertProfile,
+	useFavoriteAlbumByRank,
+} from '@/config/supabaseClient';
+import { UserProfile } from '@/types/supabaseTypes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { useProfileInfoById, useUpsertProfile } from '@/config/supabaseClient';
-import { UserProfile } from '@/types/supabaseTypes';
-import clsx from 'clsx';
 
 const usernameSchema = z
 	.string()
@@ -70,15 +74,7 @@ export default function Profile() {
 			<hr className='border-t border-slate-500'></hr>
 			<div className='flex justify-between'>
 				<ProfileForm userData={userData} />
-				<div className='flex flex-col gap-2'>
-					<h3 className='text-lg'>Favorite Albums</h3>
-					<div className='grid grid-cols-2 gap-4'>
-						<FavoriteAlbum />
-						<FavoriteAlbum />
-						<FavoriteAlbum />
-						<FavoriteAlbum />
-					</div>
-				</div>
+				<FourFavoriteAlbums />
 			</div>
 		</div>
 	);
@@ -241,7 +237,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						/>
 					)}
 				/>
-				<ProfileFormFeedback formFeedback={formFeedback} />
+				<FormFeedback formFeedback={formFeedback} />
 				<Button
 					type='submit'
 					size='sm'
@@ -283,36 +279,64 @@ function ProfileInput({
 	);
 }
 
-function ProfileFormFeedback({
-	formFeedback,
-}: {
-	formFeedback: { message: string; isSuccess: boolean } | null;
-}) {
-	if (!formFeedback) return null;
-
+function FourFavoriteAlbums() {
 	return (
-		<p
-			className={clsx('col-span-2 mt-2 text-sm', {
-				'text-green-500': formFeedback.isSuccess,
-				'text-red-500': !formFeedback.isSuccess,
-			})}
-		>
-			{formFeedback.message}
-		</p>
+		<div className='flex flex-col gap-2'>
+			<h3 className='text-lg'>Favorite Albums</h3>
+			<div className='grid grid-cols-2 gap-4'>
+				<FavoriteAlbum rank={1} />
+				<FavoriteAlbum rank={2} />
+				<FavoriteAlbum rank={3} />
+				<FavoriteAlbum rank={4} />
+			</div>
+		</div>
 	);
 }
 
-function FavoriteAlbum() {
+function FavoriteAlbum({ rank }: { rank: number }) {
+	const [open, setOpen] = useState(false);
+	const [formFeedback, setFormFeedback] = useState<{
+		message: string;
+		isSuccess: boolean;
+	} | null>(null);
+
+	const { data: favAlbum } = useFavoriteAlbumByRank(rank);
+
+	function closeDialog() {
+		setOpen(false);
+	}
+
 	return (
-		<Dialog>
-			<DialogTrigger className='flex size-[200px] items-center justify-center rounded-lg bg-slate-600 hover:bg-slate-700'>
-				<PlusCircle size={24} />
+		<Dialog
+			open={open}
+			onOpenChange={setOpen}
+		>
+			<DialogTrigger className='flex size-[200px] items-center justify-center rounded-lg bg-slate-600 hover:cursor-pointer hover:bg-slate-700'>
+				{favAlbum ? (
+					<img
+						src={favAlbum.images[0].url}
+						alt={`${favAlbum.name} album cover`}
+					/>
+				) : (
+					<PlusCircle size={24} />
+				)}
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent
+				className='flex flex-col gap-4'
+				aria-describedby='Pick a favorite album'
+			>
 				<DialogHeader>
 					<DialogTitle>Pick a favorite album</DialogTitle>
 				</DialogHeader>
-				<FavoriteAlbumPicker />
+				<FavoriteAlbumPicker
+					rank={rank}
+					closeDialog={closeDialog}
+					setFormFeedback={setFormFeedback}
+				/>
+				<FormFeedback
+					formFeedback={formFeedback}
+					className='rounded bg-red-50 px-1 py-2'
+				/>
 			</DialogContent>
 		</Dialog>
 	);

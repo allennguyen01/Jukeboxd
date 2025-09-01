@@ -9,8 +9,19 @@ import {
 import { LoaderCircle } from 'lucide-react';
 import { useSearchAlbums } from '@/config/spotifyClient';
 import { useDebounce } from '@/lib/hooks';
+import { useUpsertFavorite } from '@/config/supabaseClient';
 
-export default function FavoriteAlbumPicker() {
+export default function FavoriteAlbumPicker({
+	rank,
+	closeDialog,
+	setFormFeedback,
+}: {
+	rank: number;
+	closeDialog: () => void;
+	setFormFeedback: (
+		feedback: { message: string; isSuccess: boolean } | null,
+	) => void;
+}) {
 	const [query, setQuery] = useState('');
 	const debouncedQuery = useDebounce(query, 500);
 
@@ -20,6 +31,32 @@ export default function FavoriteAlbumPicker() {
 		error,
 		data: albums = [],
 	} = useSearchAlbums(debouncedQuery);
+
+	const { mutate: addFavorite } = useUpsertFavorite();
+
+	function onSelect(album: SpotifyApi.AlbumObjectSimplified) {
+		const favorite = {
+			album_id: album.id,
+			rank,
+		};
+
+		addFavorite(favorite, {
+			onSuccess: () => {
+				setFormFeedback({
+					message: 'Favorite added successfully!',
+					isSuccess: true,
+				});
+				closeDialog();
+			},
+			onError: (error) => {
+				console.error(error);
+				setFormFeedback({
+					message: `Failed to add favorite: ${error.message}`,
+					isSuccess: false,
+				});
+			},
+		});
+	}
 
 	return (
 		<Command shouldFilter={false}>
@@ -43,19 +80,18 @@ export default function FavoriteAlbumPicker() {
 					<CommandItem
 						key={album.id}
 						value={album.name}
-						onSelect={() => alert(`Selected ${album.name}`)}
+						onSelect={() => onSelect(album)}
+						className='flex flex-col items-start gap-1 hover:cursor-pointer hover:text-slate-900'
 					>
-						<div>
-							<p className='font-medium'>
-								{album.name}{' '}
-								<span className='font-light'>
-									({album.release_date.slice(0, 4)})
-								</span>
-							</p>
-							<p className='text-muted-foreground text-sm'>
-								{album.artists.map((artist) => artist.name).join(', ')}
-							</p>
-						</div>
+						<p className='font-medium'>
+							{album.name}{' '}
+							<span className='font-light'>
+								({album.release_date.slice(0, 4)})
+							</span>
+						</p>
+						<p className='text-xs'>
+							{album.artists.map((artist) => artist.name).join(', ')}
+						</p>
 					</CommandItem>
 				))}
 			</CommandList>
