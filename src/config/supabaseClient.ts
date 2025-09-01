@@ -1,7 +1,7 @@
 import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { UseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult, useQueryClient } from '@tanstack/react-query';
 import spotifyClient from './spotifyClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -153,6 +153,7 @@ function useFavoriteAlbumByRank(
 
 function useUpsertFavorite() {
 	const { data: user } = useUser();
+	const queryClient = useQueryClient();
 
 	async function upsertFavorite(albumData: { album_id: string; rank: number }) {
 		if (!user) throw new Error('User not authenticated');
@@ -169,7 +170,13 @@ function useUpsertFavorite() {
 		return data;
 	}
 
-	return useMutation({ mutationFn: upsertFavorite });
+	return useMutation({
+		mutationFn: upsertFavorite,
+		onSuccess: () => {
+			// Invalidate query so that the updated favorite album is refetched
+			queryClient.invalidateQueries({ queryKey: ['four_favorites', user?.id] });
+		},
+	});
 }
 
 export default supabase;
