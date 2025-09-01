@@ -1,6 +1,8 @@
 import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useQueryClient } from '@tanstack/react-query';
+import spotifyClient from './spotifyClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -9,8 +11,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 function useUser() {
 	async function getUser() {
 		const {
+			error,
 			data: { user },
 		} = await supabase.auth.getUser();
+
+		if (error) throw error;
 
 		return user;
 	}
@@ -115,12 +120,73 @@ function useUpsertProfile() {
 	return useMutation({ mutationFn: upsertProfile });
 }
 
+// Favorite Albums
+
+function useFavoriteAlbumByRank(
+	rank: number,
+): UseQueryResult<SpotifyApi.SingleAlbumResponse> {
+	const { data: user } = useUser();
+
+	async function getFavoriteAlbumByRank() {
+		if (!user) throw new Error('User not authenticated');
+
+		const { data: album, error } = await supabase
+			.from('four_favorites')
+			.select()
+			.eq('user_id', user.id)
+			.eq('rank', rank)
+			.maybeSingle();
+
+		if (error) throw error;
+
+		return spotifyClient
+			.get(`albums/${album.album_id}`)
+			.then((res) => res.data);
+	}
+
+	return useQuery({
+		queryKey: ['four_favorites', user?.id, rank],
+		queryFn: getFavoriteAlbumByRank,
+		enabled: !!user?.id,
+	});
+}
+
+function useUpsertFavorite() {
+	const { data: user } = useUser();
+	const queryClient = useQueryClient();
+
+	async function upsertFavorite(albumData: { album_id: string; rank: number }) {
+		if (!user) throw new Error('User not authenticated');
+
+		const { data, error } = await supabase
+			.from('four_favorites')
+			.upsert([{ ...albumData, user_id: user.id }], {
+				onConflict: 'user_id, rank',
+			})
+			.select();
+
+		if (error) throw error;
+
+		return data;
+	}
+
+	return useMutation({
+		mutationFn: upsertFavorite,
+		onSuccess: () => {
+			// Invalidate query so that the updated favorite album is refetched
+			queryClient.invalidateQueries({ queryKey: ['four_favorites', user?.id] });
+		},
+	});
+}
+
 export default supabase;
 export {
 	useUser,
 	useReviews,
-	useUpsertReview,
 	useReviewByAlbumId,
 	useProfileInfoById,
+	useFavoriteAlbumByRank,
+	useUpsertReview,
+	useUpsertFavorite,
 	useUpsertProfile,
 };
