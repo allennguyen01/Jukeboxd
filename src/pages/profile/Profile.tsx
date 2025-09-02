@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { useProfileInfoById } from '@/config/supabaseClient';
+import { useProfileInfo } from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Profile() {
-	const { data: userData } = useProfileInfoById();
+	const { data: userData } = useProfileInfo();
 
 	return (
 		<div className='my-5 w-5xl'>

@@ -80,7 +80,7 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
-function useProfileInfoById() {
+function useProfileInfo() {
 	const { data: user } = useUser();
 
 	async function getProfileInfo() {
@@ -184,7 +184,7 @@ export {
 	useUser,
 	useReviews,
 	useReviewByAlbumId,
-	useProfileInfoById,
+	useProfileInfo,
 	useFavoriteAlbumByRank,
 	useUpsertReview,
 	useUpsertFavorite,

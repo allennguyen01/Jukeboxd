@@ -22,7 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import FormFeedback from '@/components/common/FormFeedback';
 
 import {
-	useProfileInfoById,
+	useProfileInfo,
 	useUpsertProfile,
 	useFavoriteAlbumByRank,
 } from '@/config/supabaseClient';
@@ -60,7 +60,7 @@ const formSchema = z.object({
 });
 
 export default function ProfileEdit() {
-	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
+	const { isLoading: isLoadingUserData, data: userData } = useProfileInfo();
 
 	if (isLoadingUserData || !userData) {
 		return (
