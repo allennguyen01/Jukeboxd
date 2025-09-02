@@ -41,9 +41,13 @@ async function createSpotifyClient() {
 	return instance;
 }
 
+function getSpotifyAlbum(id: string): Promise<SpotifyApi.SingleAlbumResponse> {
+	return spotifyClient.get(`albums/${id}`).then((res) => res.data);
+}
+
 function useAlbum(id: string): UseQueryResult<SpotifyApi.SingleAlbumResponse> {
 	function getAlbum() {
-		return spotifyClient.get(`albums/${id}`).then((res) => res.data);
+		return getSpotifyAlbum(id);
 	}
 
 	return useQuery({
@@ -130,4 +134,10 @@ function useAlbumsBySearchQuery(searchQuery: string, limit = 20) {
 
 const spotifyClient = await createSpotifyClient();
 export default spotifyClient;
-export { useAlbum, useAlbumGenres, useSearchAlbums, useAlbumsBySearchQuery };
+export {
+	getSpotifyAlbum,
+	useAlbum,
+	useAlbumGenres,
+	useSearchAlbums,
+	useAlbumsBySearchQuery,
+};

@@ -2,7 +2,7 @@ import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { UseQueryResult, useQueryClient } from '@tanstack/react-query';
-import spotifyClient from './spotifyClient';
+import { getSpotifyAlbum } from './spotifyClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -145,6 +145,39 @@ function useUpsertProfile() {
 
 // Favorite Albums hooks
 
+function useFavoriteAlbumsByUsername(
+	username: string,
+): UseQueryResult<SpotifyApi.SingleAlbumResponse[]> {
+	async function getFavoriteAlbumsByUsername() {
+		const { data: favAlbums, error } = await supabase
+			.from('profiles')
+			.select(
+				`
+				four_favorites(
+					album_id
+				)
+			`,
+			)
+			.eq('username', username)
+			.single();
+
+		if (error) throw error;
+
+		const fourFavAlbums = favAlbums.four_favorites;
+
+		const albumPromises = fourFavAlbums.map((album: { album_id: string }) =>
+			getSpotifyAlbum(album.album_id),
+		);
+
+		return Promise.all(albumPromises);
+	}
+
+	return useQuery({
+		queryKey: ['four_favorites', username],
+		queryFn: getFavoriteAlbumsByUsername,
+	});
+}
+
 function useFavoriteAlbumByRank(
 	rank: number,
 ): UseQueryResult<SpotifyApi.SingleAlbumResponse> {
@@ -162,9 +195,7 @@ function useFavoriteAlbumByRank(
 
 		if (error) throw error;
 
-		return spotifyClient
-			.get(`albums/${album.album_id}`)
-			.then((res) => res.data);
+		return getSpotifyAlbum(album.album_id);
 	}
 
 	return useQuery({
@@ -209,6 +240,7 @@ export {
 	useReviewByAlbumId,
 	useProfileInfo,
 	useProfileInfoByUsername,
+	useFavoriteAlbumsByUsername,
 	useFavoriteAlbumByRank,
 	useUpsertReview,
 	useUpsertFavorite,

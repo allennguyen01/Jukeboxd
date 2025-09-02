@@ -2,6 +2,9 @@ import { NavLink, useParams, useNavigate } from 'react-router-dom';
 import { useProfileInfoByUsername } from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import HeaderDivider from '@/components/typography/HeaderDivider';
+import { useFavoriteAlbumsByUsername } from '@/config/supabaseClient';
+import CoverLink from '@/components/CoverLink';
 
 export default function Profile() {
 	const navigate = useNavigate();
@@ -22,8 +25,9 @@ export default function Profile() {
 	}
 
 	return (
-		<div className='my-5 w-5xl'>
+		<div className='my-5 flex w-5xl flex-col gap-6'>
 			<ProfileHeader userData={userData} />
+			<FourFavoriteAlbums username={username} />
 		</div>
 	);
 }
@@ -90,5 +94,43 @@ function ProfileHeader({ userData }: { userData: any }) {
 			</div>
 			{bio && <p className='text-sm whitespace-pre-line'>{bio}</p>}
 		</section>
+	);
+}
+
+function FourFavoriteAlbums({ username }: { username: string }) {
+	const {
+		isLoading,
+		isError,
+		error,
+		data: favAlbums,
+	} = useFavoriteAlbumsByUsername(username);
+
+	return (
+		<div className='flex flex-col gap-2'>
+			<HeaderDivider text='FAVORITE ALBUMS' />
+			{isLoading && <p>Loading favorite albums...</p>}
+			{isError && <p>Error loading favorite albums: {error?.message}</p>}
+			{favAlbums && favAlbums.length > 0 ? (
+				<div className='flex gap-2'>
+					{favAlbums.map((album) => (
+						<CoverLink
+							key={album.id}
+							album={album}
+						/>
+					))}
+				</div>
+			) : (
+				<p className='text-slate-400'>
+					Don't forget to select your{' '}
+					<NavLink
+						to='/settings'
+						className='text-slate-200 hover:text-blue-400'
+					>
+						favorite albums
+					</NavLink>
+					!
+				</p>
+			)}
+		</div>
 	);
 }
