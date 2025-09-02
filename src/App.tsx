@@ -6,7 +6,7 @@ import SearchResults from '@/pages/SearchResults';
 import Reviews from '@/pages/Reviews';
 import Profile from './pages/profile/Profile';
 import ProfileEdit from './pages/profile/ProfileEdit';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
 	return (
@@ -37,16 +37,25 @@ function App() {
 						element={<Album />}
 					/>
 					<Route
-						path='/profile'
+						path='/:username'
 						element={<Profile />}
 					/>
 					<Route
-						path='/profile/edit'
+						path='/settings'
 						element={<ProfileEdit />}
 					/>
 					<Route
-						path='*'
+						path='/404'
 						element={<p>Page not found</p>}
+					/>
+					<Route
+						path='*'
+						element={
+							<Navigate
+								to='/404'
+								replace
+							/>
+						}
 					/>
 				</Route>
 			</Routes>

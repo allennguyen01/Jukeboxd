@@ -133,7 +133,7 @@ function ProfileDropdown() {
 				{username.toUpperCase()} <FaAngleDown />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-full rounded-sm border-0 p-0'>
-				<NavLink to='/profile'>
+				<NavLink to={`/${username}`}>
 					<DropdownMenuItem className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
 						Profile
 					</DropdownMenuItem>

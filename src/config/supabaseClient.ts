@@ -80,6 +80,8 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
+// Profile hooks
+
 function useProfileInfo() {
 	const { data: user } = useUser();
 
@@ -105,6 +107,27 @@ function useProfileInfo() {
 	});
 }
 
+function useProfileInfoByUsername(username: string) {
+	async function getProfileInfoByUsername() {
+		const { data: profile, error } = await supabase
+			.from('profiles')
+			.select()
+			.eq('username', username)
+			.limit(1)
+			.single();
+
+		if (error) throw error;
+
+		return profile;
+	}
+
+	return useQuery({
+		queryKey: ['profile', username],
+		queryFn: getProfileInfoByUsername,
+		enabled: !!username, // Only run the query when username is available
+	});
+}
+
 function useUpsertProfile() {
 	async function upsertProfile(profileData: Omit<UserProfile, 'created_at'>) {
 		const { data, error } = await supabase
@@ -120,7 +143,7 @@ function useUpsertProfile() {
 	return useMutation({ mutationFn: upsertProfile });
 }
 
-// Favorite Albums
+// Favorite Albums hooks
 
 function useFavoriteAlbumByRank(
 	rank: number,
@@ -185,6 +208,7 @@ export {
 	useReviews,
 	useReviewByAlbumId,
 	useProfileInfo,
+	useProfileInfoByUsername,
 	useFavoriteAlbumByRank,
 	useUpsertReview,
 	useUpsertFavorite,

@@ -1,10 +1,25 @@
-import { NavLink } from 'react-router-dom';
-import { useProfileInfo } from '@/config/supabaseClient';
+import { NavLink, useParams, useNavigate } from 'react-router-dom';
+import { useProfileInfoByUsername } from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Profile() {
-	const { data: userData } = useProfileInfo();
+	const navigate = useNavigate();
+	const { username = '' } = useParams();
+	const {
+		isLoading,
+		isError,
+		error,
+		data: userData,
+	} = useProfileInfoByUsername(username);
+
+	if (isLoading) return <p>Loading profile...</p>;
+
+	if (isError) return <p>Error loading profile: {error?.message}</p>;
+
+	if (!userData) {
+		navigate('/404');
+	}
 
 	return (
 		<div className='my-5 w-5xl'>
@@ -39,7 +54,7 @@ function ProfileHeader({ userData }: { userData: any }) {
 					)}
 				</h1>
 				<NavLink
-					to={`/profile/edit`}
+					to='/settings'
 					className='text-sm'
 				>
 					<Button
