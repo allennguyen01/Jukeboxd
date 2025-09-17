@@ -1,10 +1,15 @@
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
-import { useProfileInfoByUsername, useUser } from '@/config/supabaseClient';
+import {
+	useProfileInfoByUsername,
+	useUser,
+	useRecentReviewsByUserId,
+} from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import { useFavoriteAlbumsByUsername } from '@/config/supabaseClient';
 import CoverLink from '@/components/CoverLink';
+import RecentActivityCard from '@/components/RecentActivityCard';
 
 export default function Profile() {
 	const navigate = useNavigate();
@@ -27,16 +32,22 @@ export default function Profile() {
 	return (
 		<div className='my-5 flex w-5xl flex-col gap-6'>
 			<ProfileHeader userData={userData} />
-			<FourFavoriteAlbums username={username} />
+			<div className='flex w-3xl flex-col gap-4'>
+				<FourFavoriteAlbums username={username} />
+				<div className='flex flex-col gap-2'>
+					<HeaderDivider text='RECENT ACTIVITY' />
+					<RecentActivity userId={userData.id} />
+				</div>
+			</div>
 		</div>
 	);
 }
 
 function ProfileHeader({ userData }: { userData: any }) {
 	const { data: user } = useUser();
-  
+
 	const {
-    id,
+		id,
 		username,
 		first_name: firstName,
 		last_name: lastName,
@@ -45,8 +56,8 @@ function ProfileHeader({ userData }: { userData: any }) {
 		bio,
 		website,
 	} = userData;
-  
-  const viewingOwnProfile = user?.id === userData.id;
+
+	const viewingOwnProfile = user?.id === id;
 
 	return (
 		<section className='flex flex-col gap-4 text-slate-300'>
@@ -118,10 +129,12 @@ function FourFavoriteAlbums({ username }: { username: string }) {
 			{favAlbums && favAlbums.length > 0 ? (
 				<div className='flex gap-2'>
 					{favAlbums.map((album) => (
-						<CoverLink
-							key={album.id}
-							album={album}
-						/>
+						<div>
+							<CoverLink
+								key={album.id}
+								album={album}
+							/>
+						</div>
 					))}
 				</div>
 			) : (
@@ -136,6 +149,39 @@ function FourFavoriteAlbums({ username }: { username: string }) {
 					!
 				</p>
 			)}
+		</div>
+	);
+}
+
+function RecentActivity({ userId }: { userId: string }) {
+	const {
+		isLoading: isLoadingReviews,
+		isError: isErrorReviews,
+		error: errorReviews,
+		data: recentReviews,
+	} = useRecentReviewsByUserId(userId, 4);
+
+	console.log(recentReviews);
+
+	if (isLoadingReviews)
+		return <p className='text-slate-400'>Loading recent activity...</p>;
+	if (isErrorReviews)
+		return (
+			<p className='text-red-400'>
+				Error loading recent activity: {errorReviews?.message}
+			</p>
+		);
+	if (!recentReviews || recentReviews.length === 0)
+		return <p className='text-slate-400'>No recent activity found.</p>;
+
+	return (
+		<div className='flex gap-2'>
+			{recentReviews.map((review) => (
+				<RecentActivityCard
+					key={`${review.id}-${review.user_id}`}
+					review={review}
+				/>
+			))}
 		</div>
 	);
 }

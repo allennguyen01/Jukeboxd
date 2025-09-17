@@ -80,6 +80,27 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
+function useRecentReviewsByUserId(userId: string, limit: number = 4) {
+	async function getRecentReviewsByUserId(): Promise<AlbumReview[]> {
+		const { data: reviews, error } = await supabase
+			.from('reviews')
+			.select()
+			.eq('user_id', userId)
+			.order('created_at', { ascending: false })
+			.limit(limit);
+
+		if (error) throw error;
+
+		return reviews;
+	}
+
+	return useQuery({
+		queryKey: ['recent_reviews', userId, limit],
+		queryFn: getRecentReviewsByUserId,
+		enabled: !!userId,
+	});
+}
+
 // Profile hooks
 
 function useProfileInfo() {
@@ -238,6 +259,7 @@ export {
 	useUser,
 	useReviews,
 	useReviewByAlbumId,
+	useRecentReviewsByUserId,
 	useProfileInfo,
 	useProfileInfoByUsername,
 	useFavoriteAlbumsByUsername,
