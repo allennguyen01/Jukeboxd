@@ -1,5 +1,5 @@
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
-import { useProfileInfoByUsername } from '@/config/supabaseClient';
+import { useProfileInfoByUsername, useUser } from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeaderDivider from '@/components/typography/HeaderDivider';
@@ -33,9 +33,10 @@ export default function Profile() {
 }
 
 function ProfileHeader({ userData }: { userData: any }) {
-	if (!userData) return null;
-
+	const { data: user } = useUser();
+  
 	const {
+    id,
 		username,
 		first_name: firstName,
 		last_name: lastName,
@@ -44,6 +45,8 @@ function ProfileHeader({ userData }: { userData: any }) {
 		bio,
 		website,
 	} = userData;
+  
+  const viewingOwnProfile = user?.id === userData.id;
 
 	return (
 		<section className='flex flex-col gap-4 text-slate-300'>
@@ -57,17 +60,19 @@ function ProfileHeader({ userData }: { userData: any }) {
 						username
 					)}
 				</h1>
-				<NavLink
-					to='/settings'
-					className='text-sm'
-				>
-					<Button
-						size='sm'
-						variant='outline'
+				{viewingOwnProfile && (
+					<NavLink
+						to='/settings'
+						className='text-sm'
 					>
-						EDIT PROFILE
-					</Button>
-				</NavLink>
+						<Button
+							size='sm'
+							variant='outline'
+						>
+							EDIT PROFILE
+						</Button>
+					</NavLink>
+				)}
 			</div>
 			<div className='flex gap-10'>
 				{email && (
