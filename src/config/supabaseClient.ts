@@ -1,4 +1,8 @@
-import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
+import {
+	AlbumReview,
+	AlbumReviewInsert,
+	UserProfile,
+} from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { UseQueryResult, useQueryClient } from '@tanstack/react-query';
@@ -45,10 +49,10 @@ function useReviews() {
 }
 
 function useUpsertReview() {
-	async function upsertReview(reviewData: Omit<AlbumReview, 'created_at'>) {
+	async function upsertReview(reviewData: AlbumReviewInsert) {
 		const { data, error } = await supabase
 			.from('reviews')
-			.upsert([reviewData], { onConflict: 'id, user_id' })
+			.upsert([reviewData], { onConflict: 'album_id, user_id' })
 			.select();
 
 		if (error) throw error;
@@ -64,7 +68,7 @@ function useReviewByAlbumId(albumId: string) {
 		const { data: review, error } = await supabase
 			.from('reviews')
 			.select()
-			.eq('id', albumId)
+			.eq('album_id', albumId)
 			.single();
 
 		if (!review) return null;

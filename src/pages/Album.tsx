@@ -182,7 +182,7 @@ function ReviewForm({
 
 		upsertReview(
 			{
-				id: album.id,
+				album_id: album.id,
 				user_id: user.id,
 				album_name: album.name,
 				rating,

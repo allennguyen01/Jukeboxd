@@ -9,7 +9,7 @@ export default function RecentActivityCard({
 }: {
 	review: AlbumReview;
 }) {
-	const { id: albumId, rating, review: reviewText } = review;
+	const { album_id: albumId, rating, review: reviewText } = review;
 
 	const { isPending, isError, error, data: album } = useAlbum(albumId);
 
