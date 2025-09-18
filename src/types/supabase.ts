@@ -39,6 +39,38 @@ export type Database = {
 	};
 	public: {
 		Tables: {
+			four_favorites: {
+				Row: {
+					album_id: string | null;
+					created_at: string;
+					id: number;
+					rank: number | null;
+					user_id: string | null;
+				};
+				Insert: {
+					album_id?: string | null;
+					created_at?: string;
+					id?: number;
+					rank?: number | null;
+					user_id?: string | null;
+				};
+				Update: {
+					album_id?: string | null;
+					created_at?: string;
+					id?: number;
+					rank?: number | null;
+					user_id?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'four_favorites_user_id_fkey1';
+						columns: ['user_id'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['id'];
+					},
+				];
+			};
 			profiles: {
 				Row: {
 					bio: string | null;
@@ -77,27 +109,30 @@ export type Database = {
 			};
 			reviews: {
 				Row: {
+					album_id: string;
 					album_name: string;
 					created_at: string;
-					id: string;
+					id: number;
 					listened: boolean;
 					rating: number | null;
 					review: string | null;
 					user_id: string;
 				};
 				Insert: {
+					album_id: string;
 					album_name: string;
 					created_at?: string;
-					id: string;
+					id?: number;
 					listened?: boolean;
 					rating?: number | null;
 					review?: string | null;
 					user_id: string;
 				};
 				Update: {
+					album_id?: string;
 					album_name?: string;
 					created_at?: string;
-					id?: string;
+					id?: number;
 					listened?: boolean;
 					rating?: number | null;
 					review?: string | null;
