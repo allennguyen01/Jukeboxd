@@ -1,8 +1,8 @@
 import { useAlbum } from '@/config/spotifyClient';
-import CoverLink, { CoverLinkSkeletons } from './CoverLink';
+import CoverLink, { CoverLinkSkeletons } from '@/components/CoverLink';
 import { AlbumReview } from '@/types/supabaseTypes';
 import { FileText } from 'lucide-react';
-import StarRating from './StarRating';
+import StarRating from '@/components/StarRating';
 
 export default function RecentActivityCard({
 	review,
