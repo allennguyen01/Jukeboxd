@@ -1,15 +1,10 @@
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
-import {
-	useProfileInfoByUsername,
-	useUser,
-	useRecentReviewsByUserId,
-} from '@/config/supabaseClient';
+import { useProfileInfoByUsername, useUser } from '@/config/supabaseClient';
 import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeaderDivider from '@/components/typography/HeaderDivider';
-import { useFavoriteAlbumsByUsername } from '@/config/supabaseClient';
-import CoverLink from '@/components/CoverLink';
-import RecentActivityCard from '@/components/RecentActivityCard';
+import FourFavoriteAlbums from '@/components/profile/FourFavoriteAlbums';
+import RecentActivity from '@/components/profile/RecentActivity';
 
 export default function Profile() {
 	const navigate = useNavigate();
@@ -113,76 +108,5 @@ function ProfileHeader({ userData }: { userData: any }) {
 			</div>
 			{bio && <p className='text-sm whitespace-pre-line'>{bio}</p>}
 		</section>
-	);
-}
-
-function FourFavoriteAlbums({ username }: { username: string }) {
-	const {
-		isLoading,
-		isError,
-		error,
-		data: favAlbums,
-	} = useFavoriteAlbumsByUsername(username);
-
-	if (isLoading) return <p>Loading favorite albums...</p>;
-	if (isError) return <p>Error loading favorite albums: {error?.message}</p>;
-	if (!favAlbums || favAlbums.length === 0)
-		return (
-			<p className='text-slate-400'>
-				Don't forget to select your{' '}
-				<NavLink
-					to='/settings'
-					className='text-slate-200 hover:text-blue-400'
-				>
-					favorite albums
-				</NavLink>
-				!
-			</p>
-		);
-
-	return (
-		<div className='flex gap-2'>
-			{favAlbums.map((album) => (
-				<div>
-					<CoverLink
-						key={album.id}
-						album={album}
-					/>
-				</div>
-			))}
-		</div>
-	);
-}
-
-function RecentActivity({ userId }: { userId: string }) {
-	const {
-		isLoading: isLoadingReviews,
-		isError: isErrorReviews,
-		error: errorReviews,
-		data: recentReviews,
-	} = useRecentReviewsByUserId(userId, 4);
-
-	console.log(recentReviews);
-
-	if (isLoadingReviews)
-		return <p className='text-slate-400'>Loading recent activity...</p>;
-	if (isErrorReviews)
-		return (
-			<p className='text-red-400'>
-				Error loading recent activity: {errorReviews?.message}
-			</p>
-		);
-	if (!recentReviews || recentReviews.length === 0)
-		return <p className='text-slate-400'>No recent activity found.</p>;
-
-	return (
-		<div className='flex gap-2'>
-			{recentReviews.map((review) => (
-				<RecentActivityCard
-					key={`${review.id}-${review.user_id}`}
-					review={review}
-				/>
-			))}
-		</div>
 	);
 }
