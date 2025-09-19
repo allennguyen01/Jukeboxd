@@ -33,7 +33,10 @@ export default function Profile() {
 		<div className='my-5 flex w-5xl flex-col gap-6'>
 			<ProfileHeader userData={userData} />
 			<div className='flex w-3xl flex-col gap-4'>
-				<FourFavoriteAlbums username={username} />
+				<div className='flex flex-col gap-2'>
+					<HeaderDivider text='FAVORITE ALBUMS' />
+					<FourFavoriteAlbums username={username} />
+				</div>
 				<div className='flex flex-col gap-2'>
 					<HeaderDivider text='RECENT ACTIVITY' />
 					<RecentActivity userId={userData.id} />
@@ -121,34 +124,32 @@ function FourFavoriteAlbums({ username }: { username: string }) {
 		data: favAlbums,
 	} = useFavoriteAlbumsByUsername(username);
 
+	if (isLoading) return <p>Loading favorite albums...</p>;
+	if (isError) return <p>Error loading favorite albums: {error?.message}</p>;
+	if (!favAlbums || favAlbums.length === 0)
+		return (
+			<p className='text-slate-400'>
+				Don't forget to select your{' '}
+				<NavLink
+					to='/settings'
+					className='text-slate-200 hover:text-blue-400'
+				>
+					favorite albums
+				</NavLink>
+				!
+			</p>
+		);
+
 	return (
-		<div className='flex flex-col gap-2'>
-			<HeaderDivider text='FAVORITE ALBUMS' />
-			{isLoading && <p>Loading favorite albums...</p>}
-			{isError && <p>Error loading favorite albums: {error?.message}</p>}
-			{favAlbums && favAlbums.length > 0 ? (
-				<div className='flex gap-2'>
-					{favAlbums.map((album) => (
-						<div>
-							<CoverLink
-								key={album.id}
-								album={album}
-							/>
-						</div>
-					))}
+		<div className='flex gap-2'>
+			{favAlbums.map((album) => (
+				<div>
+					<CoverLink
+						key={album.id}
+						album={album}
+					/>
 				</div>
-			) : (
-				<p className='text-slate-400'>
-					Don't forget to select your{' '}
-					<NavLink
-						to='/settings'
-						className='text-slate-200 hover:text-blue-400'
-					>
-						favorite albums
-					</NavLink>
-					!
-				</p>
-			)}
+			))}
 		</div>
 	);
 }
