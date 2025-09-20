@@ -4,7 +4,7 @@ import {
 	useUser,
 	useReviewsByUserId,
 } from '@/config/supabaseClient';
-import { Mail, MapPinHouse, MousePointerClick } from 'lucide-react';
+import { Mail, MapPinHouse, MousePointerClick, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import FourFavoriteAlbums from '@/components/profile/FourFavoriteAlbums';
@@ -49,8 +49,14 @@ export default function Profile() {
 					</div>
 				</div>
 				<div className='flex flex-col gap-4'>
-					<HeaderDivider text='BIO' />
-					{bio && <p className='text-sm whitespace-pre-line'>{bio}</p>}
+					<div className='flex flex-col gap-2'>
+						<HeaderDivider text='BIO' />
+						{bio && <p className='text-sm whitespace-pre-line'>{bio}</p>}
+					</div>
+					<div className='flex flex-col gap-2'>
+						<HeaderDivider text='REVIEW STATS' />
+						<ReviewStats userId={userData.id} />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -157,5 +163,67 @@ function ProfileStats({ userId }: { userId: string }) {
 				</div>
 			))}
 		</div>
+	);
+}
+
+function ReviewStats({ userId }: { userId: string }) {
+	const { data: reviews } = useReviewsByUserId(userId);
+
+	if (!reviews) return null;
+
+	const ratings: number[] = reviews
+		.filter((review) => review.rating !== null)
+		.map((review) => review.rating as number);
+
+	ratings.sort((a, b) => b - a);
+
+	const averageRating =
+		ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length;
+
+	const map = new Map<number, number>([
+		[0, 0],
+		[0.5, 0],
+		[1, 0],
+		[1.5, 0],
+		[2, 0],
+		[2.5, 0],
+		[3, 0],
+		[3.5, 0],
+		[4, 0],
+		[4.5, 0],
+		[5, 0],
+	]);
+
+	const ratingDistribution = ratings.reduce(
+		(acc: Map<number, number>, rating) => {
+			acc.set(rating, (acc.get(rating) || 0) + 1);
+			return acc;
+		},
+		map,
+	);
+
+	return (
+		<section className='flex flex-col items-center gap-4'>
+			<p className='flex flex-col items-center gap-2'>
+				<span className='font-playfair text-3xl font-bold'>
+					{averageRating}
+				</span>
+				<span className='text-xs text-slate-400'>AVERAGE RATING</span>
+			</p>
+			<div className='grid grid-cols-2 place-items-center gap-2 gap-x-8 gap-y-2'>
+				{Array.from(ratingDistribution.entries()).map(([rating, count]) => (
+					<div
+						key={rating}
+						className='flex items-center gap-2'
+					>
+						<span className='flex items-center'>
+							{rating}
+							<Star fill='lightgray' />:
+						</span>
+						{count}
+					</div>
+				))}
+			</div>
+		</section>
 	);
 }
