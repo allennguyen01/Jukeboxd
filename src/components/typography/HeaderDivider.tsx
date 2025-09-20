@@ -1,3 +1,5 @@
+import { Separator } from '@/components/ui/separator';
+
 export default function HeaderDivider({
 	text,
 	className = '',
@@ -9,7 +11,7 @@ export default function HeaderDivider({
 		<div className={`${className}`}>
 			<p className='mt-4'>{text}</p>
 
-			<div className='divider m-0 h-2 before:bg-neutral-600 after:bg-neutral-600'></div>
+			<Separator orientation='horizontal' />
 		</div>
 	);
 }
