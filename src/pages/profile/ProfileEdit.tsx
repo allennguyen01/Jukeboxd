@@ -316,6 +316,7 @@ function FavoriteAlbum({ rank }: { rank: number }) {
 					<img
 						src={favAlbum.images[0].url}
 						alt={`${favAlbum.name} album cover`}
+						className='rounded'
 					/>
 				) : (
 					<PlusCircle size={24} />
