@@ -84,6 +84,24 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
+function useReviewsByUserId(userId: string) {
+	async function getReviewsByUserId(): Promise<AlbumReview[]> {
+		const { data: reviews, error } = await supabase
+			.from('reviews')
+			.select()
+			.eq('user_id', userId);
+
+		if (error) throw error;
+
+		return reviews;
+	}
+
+	return useQuery({
+		queryKey: ['reviews', userId],
+		queryFn: getReviewsByUserId,
+	});
+}
+
 function useRecentReviewsByUserId(userId: string, limit: number = 4) {
 	async function getRecentReviewsByUserId(): Promise<AlbumReview[]> {
 		const { data: reviews, error } = await supabase
@@ -263,6 +281,7 @@ export {
 	useUser,
 	useReviews,
 	useReviewByAlbumId,
+	useReviewsByUserId,
 	useRecentReviewsByUserId,
 	useProfileInfo,
 	useProfileInfoByUsername,
