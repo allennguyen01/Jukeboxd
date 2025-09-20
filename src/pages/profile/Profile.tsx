@@ -122,6 +122,8 @@ function ProfileHeader({ userData }: { userData: any }) {
 						<a
 							href={website}
 							className='hover:text-blue-400 hover:underline'
+							target='_blank'
+							rel='noopener noreferrer'
 						>
 							{website}
 						</a>
