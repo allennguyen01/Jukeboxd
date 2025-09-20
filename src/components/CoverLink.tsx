@@ -26,7 +26,7 @@ export default function CoverLink({
 
 export function CoverLinkSkeletons({
 	size = 224,
-	number = 4,
+	number = 1,
 }: {
 	size?: number;
 	number?: number;

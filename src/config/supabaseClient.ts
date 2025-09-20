@@ -1,8 +1,12 @@
-import { AlbumReview, UserProfile } from '@/types/supabaseTypes';
+import {
+	AlbumReview,
+	AlbumReviewInsert,
+	UserProfile,
+} from '@/types/supabaseTypes';
 import { createClient } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { UseQueryResult, useQueryClient } from '@tanstack/react-query';
-import spotifyClient from './spotifyClient';
+import { getSpotifyAlbum } from './spotifyClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -45,10 +49,10 @@ function useReviews() {
 }
 
 function useUpsertReview() {
-	async function upsertReview(reviewData: Omit<AlbumReview, 'created_at'>) {
+	async function upsertReview(reviewData: AlbumReviewInsert) {
 		const { data, error } = await supabase
 			.from('reviews')
-			.upsert([reviewData], { onConflict: 'id, user_id' })
+			.upsert([reviewData], { onConflict: 'album_id, user_id' })
 			.select();
 
 		if (error) throw error;
@@ -64,7 +68,7 @@ function useReviewByAlbumId(albumId: string) {
 		const { data: review, error } = await supabase
 			.from('reviews')
 			.select()
-			.eq('id', albumId)
+			.eq('album_id', albumId)
 			.single();
 
 		if (!review) return null;
@@ -80,7 +84,48 @@ function useReviewByAlbumId(albumId: string) {
 	});
 }
 
-function useProfileInfoById() {
+function useReviewsByUserId(userId: string) {
+	async function getReviewsByUserId(): Promise<AlbumReview[]> {
+		const { data: reviews, error } = await supabase
+			.from('reviews')
+			.select()
+			.eq('user_id', userId);
+
+		if (error) throw error;
+
+		return reviews;
+	}
+
+	return useQuery({
+		queryKey: ['reviews', userId],
+		queryFn: getReviewsByUserId,
+	});
+}
+
+function useRecentReviewsByUserId(userId: string, limit: number = 4) {
+	async function getRecentReviewsByUserId(): Promise<AlbumReview[]> {
+		const { data: reviews, error } = await supabase
+			.from('reviews')
+			.select()
+			.eq('user_id', userId)
+			.order('created_at', { ascending: false })
+			.limit(limit);
+
+		if (error) throw error;
+
+		return reviews;
+	}
+
+	return useQuery({
+		queryKey: ['recent_reviews', userId, limit],
+		queryFn: getRecentReviewsByUserId,
+		enabled: !!userId,
+	});
+}
+
+// Profile hooks
+
+function useProfileInfo() {
 	const { data: user } = useUser();
 
 	async function getProfileInfo() {
@@ -105,6 +150,27 @@ function useProfileInfoById() {
 	});
 }
 
+function useProfileInfoByUsername(username: string) {
+	async function getProfileInfoByUsername() {
+		const { data: profile, error } = await supabase
+			.from('profiles')
+			.select()
+			.eq('username', username)
+			.limit(1)
+			.single();
+
+		if (error) throw error;
+
+		return profile;
+	}
+
+	return useQuery({
+		queryKey: ['profile', username],
+		queryFn: getProfileInfoByUsername,
+		enabled: !!username, // Only run the query when username is available
+	});
+}
+
 function useUpsertProfile() {
 	async function upsertProfile(profileData: Omit<UserProfile, 'created_at'>) {
 		const { data, error } = await supabase
@@ -120,7 +186,40 @@ function useUpsertProfile() {
 	return useMutation({ mutationFn: upsertProfile });
 }
 
-// Favorite Albums
+// Favorite Albums hooks
+
+function useFavoriteAlbumsByUsername(
+	username: string,
+): UseQueryResult<SpotifyApi.SingleAlbumResponse[]> {
+	async function getFavoriteAlbumsByUsername() {
+		const { data: favAlbums, error } = await supabase
+			.from('profiles')
+			.select(
+				`
+				four_favorites(
+					album_id
+				)
+			`,
+			)
+			.eq('username', username)
+			.single();
+
+		if (error) throw error;
+
+		const fourFavAlbums = favAlbums.four_favorites;
+
+		const albumPromises = fourFavAlbums.map((album: { album_id: string }) =>
+			getSpotifyAlbum(album.album_id),
+		);
+
+		return Promise.all(albumPromises);
+	}
+
+	return useQuery({
+		queryKey: ['four_favorites', username],
+		queryFn: getFavoriteAlbumsByUsername,
+	});
+}
 
 function useFavoriteAlbumByRank(
 	rank: number,
@@ -139,9 +238,7 @@ function useFavoriteAlbumByRank(
 
 		if (error) throw error;
 
-		return spotifyClient
-			.get(`albums/${album.album_id}`)
-			.then((res) => res.data);
+		return getSpotifyAlbum(album.album_id);
 	}
 
 	return useQuery({
@@ -184,7 +281,11 @@ export {
 	useUser,
 	useReviews,
 	useReviewByAlbumId,
-	useProfileInfoById,
+	useReviewsByUserId,
+	useRecentReviewsByUserId,
+	useProfileInfo,
+	useProfileInfoByUsername,
+	useFavoriteAlbumsByUsername,
 	useFavoriteAlbumByRank,
 	useUpsertReview,
 	useUpsertFavorite,

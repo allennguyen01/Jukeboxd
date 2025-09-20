@@ -121,7 +121,7 @@ function SortByDropdown({
 
 function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 	const {
-		id,
+		album_id: albumId,
 		album_name: albumName,
 		created_at: createDate,
 		rating,
@@ -130,7 +130,7 @@ function AlbumReviewCard({ albumReview }: { albumReview: AlbumReview }) {
 
 	const initialRating = rating ?? 0;
 
-	const { isPending, isError, error, data: album } = useAlbum(id);
+	const { isPending, isError, error, data: album } = useAlbum(albumId);
 
 	if (isPending) return <AlbumReviewCardSkeletons number={1} />;
 	if (isError) return <div>Error: {error.message}</div>;

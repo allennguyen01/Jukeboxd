@@ -111,8 +111,8 @@ function BrowseAlbumCarousel({
 	}
 	if (isPending || albums.length === 0) {
 		return (
-			<div className='mx-3 mb-28 mt-4 flex justify-between'>
-				<CoverLinkSkeletons />
+			<div className='mx-3 mt-4 mb-28 flex justify-between'>
+				<CoverLinkSkeletons number={4} />
 			</div>
 		);
 	}

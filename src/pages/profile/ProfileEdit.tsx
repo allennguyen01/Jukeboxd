@@ -22,7 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import FormFeedback from '@/components/common/FormFeedback';
 
 import {
-	useProfileInfoById,
+	useProfileInfo,
 	useUpsertProfile,
 	useFavoriteAlbumByRank,
 } from '@/config/supabaseClient';
@@ -59,8 +59,8 @@ const formSchema = z.object({
 	bio: emptyToNull(z.string().max(250, 'Bio must be at most 250 characters')),
 });
 
-export default function Profile() {
-	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
+export default function ProfileEdit() {
+	const { isLoading: isLoadingUserData, data: userData } = useProfileInfo();
 
 	if (isLoadingUserData || !userData) {
 		return (
@@ -316,6 +316,7 @@ function FavoriteAlbum({ rank }: { rank: number }) {
 					<img
 						src={favAlbum.images[0].url}
 						alt={`${favAlbum.name} album cover`}
+						className='rounded'
 					/>
 				) : (
 					<PlusCircle size={24} />

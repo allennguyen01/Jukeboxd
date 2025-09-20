@@ -4,8 +4,9 @@ import Albums from '@/pages/Albums';
 import Album from '@/pages/Album';
 import SearchResults from '@/pages/SearchResults';
 import Reviews from '@/pages/Reviews';
-import Profile from '@/pages/Profile';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Profile from './pages/profile/Profile';
+import ProfileEdit from './pages/profile/ProfileEdit';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
 	return (
@@ -36,12 +37,25 @@ function App() {
 						element={<Album />}
 					/>
 					<Route
-						path='/profile'
+						path='/:username'
 						element={<Profile />}
 					/>
 					<Route
-						path='*'
+						path='/settings'
+						element={<ProfileEdit />}
+					/>
+					<Route
+						path='/404'
 						element={<p>Page not found</p>}
+					/>
+					<Route
+						path='*'
+						element={
+							<Navigate
+								to='/404'
+								replace
+							/>
+						}
 					/>
 				</Route>
 			</Routes>

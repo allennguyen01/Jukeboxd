@@ -7,7 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import supabase, { useUser, useProfileInfoById } from '@/config/supabaseClient';
+import supabase, { useUser, useProfileInfo } from '@/config/supabaseClient';
 import AuthDialog from './AuthDialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -116,7 +116,7 @@ async function handleSignOut() {
 }
 
 function ProfileDropdown() {
-	const { isLoading: isLoadingUserData, data: userData } = useProfileInfoById();
+	const { isLoading: isLoadingUserData, data: userData } = useProfileInfo();
 	const { username } = userData || {};
 
 	if (isLoadingUserData) {
@@ -133,7 +133,7 @@ function ProfileDropdown() {
 				{username.toUpperCase()} <FaAngleDown />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-full rounded-sm border-0 p-0'>
-				<NavLink to='/profile'>
+				<NavLink to={`/${username}`}>
 					<DropdownMenuItem className='h-12 rounded-none font-semibold hover:cursor-pointer hover:bg-slate-500 hover:text-slate-300'>
 						Profile
 					</DropdownMenuItem>
