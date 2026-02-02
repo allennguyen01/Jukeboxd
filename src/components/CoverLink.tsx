@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 export default function CoverLink({
 	album,
 	size = 224,
+	className = '',
 }: {
 	album: SpotifyApi.AlbumObjectSimplified;
 	size?: number;
+	className?: string;
 }) {
 	const navigate = useNavigate();
 	function navigateToAlbum() {
@@ -18,7 +20,7 @@ export default function CoverLink({
 			alt={`${album.name} album cover`}
 			width={size}
 			height={size}
-			className='box-border h-fit rounded transition duration-150 hover:cursor-pointer hover:shadow-white'
+			className={`box-border h-fit rounded transition duration-150 hover:cursor-pointer hover:shadow-white ${className}`}
 			onClick={navigateToAlbum}
 		/>
 	);

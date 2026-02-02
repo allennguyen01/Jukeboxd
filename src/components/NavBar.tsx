@@ -16,7 +16,7 @@ export default function NavBar() {
 	const { data: user } = useUser();
 
 	return (
-		<section className='flex min-h-18 w-full justify-center bg-zinc-900'>
+		<section className='flex min-h-20 w-full justify-center bg-zinc-900'>
 			<div className='flex w-[1024px] items-center justify-between'>
 				<NavLink to='/'>
 					<Button
