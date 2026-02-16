@@ -24,13 +24,13 @@ export default function AuthDialog({ TriggerButton }: AuthDialogProps) {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>{TriggerButton}</DialogTrigger>
-			<Tabs
-				defaultValue='sign-in'
-				className='w-full'
+			<DialogContent
+				className='border-0 bg-slate-700 px-8 py-8 sm:max-w-[425px]'
+				aria-describedby='Sign in form'
 			>
-				<DialogContent
-					className='border-0 bg-slate-700 px-8 py-8 sm:max-w-[425px]'
-					aria-describedby='Sign in form'
+				<Tabs
+					defaultValue='sign-in'
+					className='w-full'
 				>
 					<TabsList className='mb-2 w-full justify-between'>
 						<TabsTrigger
@@ -52,8 +52,8 @@ export default function AuthDialog({ TriggerButton }: AuthDialogProps) {
 					<TabsContent value='create-account'>
 						<CreateAccountForm />
 					</TabsContent>
-				</DialogContent>
-			</Tabs>
+				</Tabs>
+			</DialogContent>
 		</Dialog>
 	);
 }
@@ -104,7 +104,7 @@ function SignInForm() {
 				<DialogTitle className='font-light text-slate-100'>
 					SIGN IN TO JUKEBOXD
 				</DialogTitle>
-				<DialogDescription className='text-sm dark:text-slate-300'>
+				<DialogDescription className='text-sm text-slate-300'>
 					Enter your email and password to sign in.
 				</DialogDescription>
 			</DialogHeader>
@@ -133,7 +133,7 @@ function SignInForm() {
 				<Button
 					type='submit'
 					form='sign-in'
-					className='dark:bg-primary-600 dark:hover:bg-primary-800 w-1/2 rounded-sm py-2 font-semibold dark:text-white'
+					className='bg-primary-600 hover:bg-primary-800 w-1/2 rounded-sm py-2 font-semibold text-white'
 				>
 					SIGN IN
 				</Button>
@@ -236,7 +236,7 @@ function CreateAccountForm() {
 				<DialogTitle className='font-light text-slate-200'>
 					JOIN JUKEBOXD
 				</DialogTitle>
-				<DialogDescription className='text-sm dark:text-slate-300'>
+				<DialogDescription className='text-sm text-slate-300'>
 					Enter your email and password to create an account.
 				</DialogDescription>
 			</DialogHeader>
@@ -275,7 +275,7 @@ function CreateAccountForm() {
 				<Button
 					type='submit'
 					form='create-account-form'
-					className='dark:bg-secondary-600 dark:hover:bg-secondary-800 w-1/2 rounded-sm dark:text-white'
+					className='bg-secondary-600 hover:bg-secondary-800 w-1/2 rounded-sm text-white'
 				>
 					CREATE ACCOUNT
 				</Button>
@@ -313,7 +313,7 @@ function AuthInput({ label, type, id }: AuthInputProps) {
 				name={id}
 				type={type}
 				className={cn(
-					'w-full rounded-sm text-neutral-700 focus:bg-white dark:bg-slate-200',
+					'w-full rounded-sm text-neutral-700 focus:bg-slate-200 bg-slate-200',
 					inputWidth[type],
 				)}
 			/>
