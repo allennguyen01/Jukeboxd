@@ -46,7 +46,7 @@ function Hero() {
 					TriggerButton={
 						<Button
 							size='lg'
-							className='mt-4 text-sm font-semibold dark:bg-primary-600 dark:text-white dark:hover:bg-primary-800 lg:text-lg'
+							className='mt-4 text-sm font-semibold bg-primary-600 text-white hover:bg-primary-800 lg:text-lg'
 						>
 							Get started — it&apos;s free!
 						</Button>
