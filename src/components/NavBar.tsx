@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import supabase, { useUser, useProfileInfo } from '@/config/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
-import { FaMagnifyingGlass, FaAngleDown } from 'react-icons/fa6';
+import { FaAngleDown } from 'react-icons/fa6';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sheet';
 import AuthDialog from './AuthDialog';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
+import SearchBox from './common/SearchBox';
 
 export default function NavBar() {
 	const { data: user } = useUser();
@@ -153,48 +153,6 @@ function LogoButton() {
 			/>
 			<p className='text-xl font-bold text-white lg:text-3xl'>Jukeboxd</p>
 		</Button>
-	);
-}
-
-function SearchBox({ onSearch }: { onSearch?: () => void } = {}) {
-	const [searchInput, setSearchInput] = useState('');
-	const navigate = useNavigate();
-
-	const handleSearch = () => {
-		onSearch?.();
-		navigate(`/search/${searchInput}`);
-	};
-
-	function performSearch() {
-		setSearchInput(
-			(document.getElementById('search-input') as HTMLInputElement).value,
-		);
-		handleSearch();
-	}
-
-	return (
-		<div className='flex rounded-full'>
-			<Input
-				id='search-input'
-				type='text'
-				className='min-w-40 rounded-l-full border-0 focus:bg-white focus:text-black'
-				onKeyDown={(e) => {
-					if (e.key === 'Enter') {
-						performSearch();
-					}
-				}}
-				onChange={(e) => setSearchInput(e.target.value)}
-			/>
-			<Button
-				variant='secondary'
-				className='rounded-r-full border-0 focus:bg-white'
-				onClick={() => {
-					performSearch();
-				}}
-			>
-				<FaMagnifyingGlass />
-			</Button>
-		</div>
 	);
 }
 
