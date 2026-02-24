@@ -65,7 +65,7 @@ export default function Album() {
 				</div>
 			</div>
 
-			<div className='flex min-w-0 flex-col gap-2 lg:col-span-3 lg:ml-10 lg:gap-8'>
+			<div className='flex min-w-0 flex-col gap-8 lg:col-span-3 lg:ml-10 lg:gap-8'>
 				<AlbumTitle album={album} />
 
 				<section>

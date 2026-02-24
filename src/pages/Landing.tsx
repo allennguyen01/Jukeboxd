@@ -14,9 +14,9 @@ import { useAlbumsBySearchQuery } from '@/config/spotifyClient';
 
 export default function Landing() {
 	return (
-		<div className='flex w-full flex-col items-center pb-16'>
+		<div className='flex w-full flex-col items-center gap-8'>
 			<Hero />
-			<main className='flex w-full max-w-(--breakpoint-lg) flex-col gap-5 px-4'>
+			<main className='flex w-full max-w-(--breakpoint-lg) flex-col gap-8'>
 				<JukeboxdLetsYou />
 				<RecentAlbums />
 			</main>
@@ -46,7 +46,7 @@ function Hero() {
 					TriggerButton={
 						<Button
 							size='lg'
-							className='mt-4 text-sm font-semibold bg-primary-600 text-white hover:bg-primary-800 lg:text-lg'
+							className='bg-primary-600 hover:bg-primary-800 mt-4 text-sm font-semibold text-white lg:text-lg'
 						>
 							Get started — it&apos;s free!
 						</Button>
@@ -74,12 +74,12 @@ function Card({
 
 	return (
 		<div
-			className={`flex h-full gap-4 lg:gap-4 rounded-sm bg-slate-600 p-4 lg:p-4 ${backgroundColors[color]}`}
+			className={`flex h-full gap-4 rounded-sm bg-slate-600 p-4 lg:gap-4 lg:p-4 ${backgroundColors[color]}`}
 		>
-			<div className="flex items-center justify-center flex-shrink-0">
+			<div className='flex flex-shrink-0 items-center justify-center'>
 				{icon}
 			</div>
-			<p className='text-slate-100 text-sm lg:text-base'>{text}</p>
+			<p className='text-sm text-slate-100 lg:text-base'>{text}</p>
 		</div>
 	);
 }
@@ -90,7 +90,7 @@ function JukeboxdLetsYou() {
 	return (
 		<section className='flex flex-col'>
 			<HeaderDivider text='JUKEBOXD LETS YOU...' />
-			<div className='grid grid-cols-1 gap-4 pt-4 lg:grid-cols-3 items-stretch'>
+			<div className='grid grid-cols-1 items-stretch gap-4 pt-4 lg:grid-cols-3'>
 				<Card
 					text="Keep track of every album you've ever listened (or just start from the
 					day you join)"
