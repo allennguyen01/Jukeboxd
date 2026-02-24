@@ -35,7 +35,7 @@ const TextCollapse = ({ text }: { text: string }) => {
 	}, [containerRef]);
 
 	return (
-		<div className='text-sm font-normal'>
+		<div className='text-xs font-normal text-slate-300 sm:text-base'>
 			<p
 				ref={containerRef}
 				className={`leading-relaxed ${clamped ? 'line-clamp-3 break-words' : ''}`}

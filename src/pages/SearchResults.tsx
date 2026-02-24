@@ -13,17 +13,18 @@ export default function SearchResults() {
 		data: albumSearch,
 	} = useSearchAlbums(searchInput);
 
-	if (isPending) return <div>Loading...</div>;
-	if (isError) return <div>Error: {error.message}</div>;
+	if (isPending) return <div className='px-3 sm:px-6'>Loading...</div>;
+	if (isError)
+		return <div className='px-3 sm:px-6'>Error: {error.message}</div>;
 
 	return (
-		<div className='flex max-w-5xl flex-col items-center justify-start'>
+		<div className='flex w-full max-w-5xl flex-col items-center justify-start px-1 sm:px-6'>
 			<HeaderDivider
 				text={`FOUND ${albumSearch.length} ALBUMS MATCHING "${searchInput.toUpperCase()}"`}
-				className='mb-4 w-full'
+				className='mb-3 w-full sm:mb-4'
 			/>
 
-			<div className='flex flex-col gap-4'>
+			<div className='flex w-full flex-col gap-3 sm:gap-4'>
 				{albumSearch.map((album: SpotifyApi.AlbumObjectSimplified) => {
 					return (
 						<AlbumCard
