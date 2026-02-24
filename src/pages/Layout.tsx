@@ -3,9 +3,11 @@ import { Outlet } from 'react-router-dom';
 
 export default function Layout() {
 	return (
-		<div className='flex flex-col items-center justify-center font-inter'>
+		<div className='font-inter flex flex-col items-center justify-center'>
 			<NavBar />
-			<Outlet />
+			<main className='flex w-full max-w-5xl flex-col items-center justify-center px-4 py-6 lg:py-8'>
+				<Outlet />
+			</main>
 		</div>
 	);
 }

@@ -1,15 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import spotifyClient, { useAlbumGenres } from '@/config/spotifyClient';
-import {
-	useUpsertReview,
-	useUser,
-	useReviewByAlbumId,
-} from '@/config/supabaseClient';
-import { User } from '@supabase/supabase-js';
-import { AlbumReview } from '@/types/supabaseTypes';
+import { useUser, useReviewByAlbumId } from '@/config/supabaseClient';
 
 import {
 	Table,
@@ -24,10 +18,7 @@ import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
 import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import { Button } from '@/components/ui/button';
-import StarRating from '@/components/StarRating';
-import IconToggle from '@/components/IconToggle';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import ReviewForm from './album/ReviewForm';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -54,24 +45,27 @@ export default function Album() {
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
-		<div className='relative m-4 grid max-w-5xl grid-cols-4'>
-			<div className='sticky top-2 flex h-min max-w-64 flex-col'>
+		<div className='relative grid max-w-5xl grid-cols-1 gap-2 lg:grid-cols-4 lg:gap-0'>
+			<div className='flex h-min flex-col items-center gap-4 sm:flex-row lg:sticky lg:top-2 lg:max-w-64 lg:flex-col lg:items-start'>
 				<img
 					src={album.images[0].url}
 					alt={album.name}
-					className='size-64 rounded-sm'
+					className='size-48 shrink-0 rounded-sm sm:size-56 lg:size-64'
 				/>
-
-				<SpotifyIconButton
-					size={50}
-					url={album.external_urls.spotify}
-					className='my-4'
-				/>
-
-				<InfoTable album={album} />
+				<div>
+					<SpotifyIconButton
+						size={30}
+						url={album.external_urls.spotify}
+						className='mb-2'
+					/>
+					<InfoTable
+						album={album}
+						className='hidden sm:block'
+					/>
+				</div>
 			</div>
 
-			<div className='col-span-3 ml-10 flex flex-col gap-8'>
+			<div className='flex min-w-0 flex-col gap-2 lg:col-span-3 lg:ml-10 lg:gap-8'>
 				<AlbumTitle album={album} />
 
 				<section>
@@ -87,7 +81,10 @@ export default function Album() {
 						text='TRACKS'
 						className='mb-2'
 					/>
-					<TracksTable tracks={album.tracks.items} />
+					<TracksTable
+						tracks={album.tracks.items}
+						initialTracks={5}
+					/>
 				</section>
 
 				<section>
@@ -148,162 +145,13 @@ function YourReview({ album }: { album: AlbumInfo }) {
 	);
 }
 
-function ReviewForm({
+function InfoTable({
 	album,
-	user,
-	albumReview,
+	className,
 }: {
 	album: AlbumInfo;
-	user: User;
-	albumReview: AlbumReview | null;
+	className?: string;
 }) {
-	const {
-		rating: initialRating,
-		review: initialReview,
-		listened: initialListened,
-		created_at: createdAtDate,
-	} = albumReview || {
-		rating: 0,
-		review: '',
-		listened: false,
-		created_at: null,
-	};
-
-	const [review, setReview] = useState<string>(initialReview ?? '');
-	const [rating, setRating] = useState<number>(initialRating ?? 0);
-	const [listened, setListened] = useState<boolean>(initialListened);
-
-	const [formError, setFormError] = useState<string | null>('');
-	const [formSuccess, setFormSuccess] = useState<string | null>('');
-	const { mutate: upsertReview } = useUpsertReview();
-
-	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-		e.preventDefault();
-
-		upsertReview(
-			{
-				album_id: album.id,
-				user_id: user.id,
-				album_name: album.name,
-				rating,
-				review,
-				listened,
-			},
-			{
-				onSuccess: () => {
-					setFormSuccess('Review saved successfully!');
-					setFormError(null);
-				},
-				onError: (error: any) => {
-					if (error.code === '23505') {
-						setFormError('Review already exists.');
-					} else {
-						setFormError(
-							`Error inserting review, please try again. Error: ${error.message}`,
-						);
-					}
-					setFormSuccess(null);
-				},
-			},
-		);
-	}
-
-	return (
-		<form
-			method='dialog'
-			onSubmit={handleSubmit}
-			className='flex flex-col gap-2'
-		>
-			<section className='flex h-full items-center gap-12 py-4'>
-				<Rating
-					rating={rating}
-					setRating={setRating}
-				/>
-				<IconToggle
-					checked={listened}
-					setChecked={setListened}
-				/>
-				<LastUpdated createdAtDate={createdAtDate} />
-			</section>
-
-			<ReviewTextBox
-				setReview={setReview}
-				review={review}
-			/>
-
-			{formError && <p className='text-red-500'>{formError}</p>}
-			{formSuccess && <p className='text-green-500'>{formSuccess}</p>}
-
-			<Button
-				className='mt-4'
-				type='submit'
-			>
-				Save
-			</Button>
-		</form>
-	);
-}
-
-function LastUpdated({ createdAtDate }: { createdAtDate: string | null }) {
-	const formattedDate = createdAtDate
-		? new Date(createdAtDate).toLocaleDateString(undefined, {
-				year: 'numeric',
-				month: 'short',
-				day: 'numeric',
-			})
-		: 'Not available';
-
-	return (
-		<div className='flex flex-col items-center gap-1'>
-			<Label className='text-base font-normal'>Last updated</Label>
-			<p className='text-slate-300'>{formattedDate}</p>
-		</div>
-	);
-}
-
-function Rating({
-	rating,
-	setRating,
-}: {
-	rating: number;
-	setRating: (rating: number) => void;
-}) {
-	return (
-		<div>
-			<Label className='text-base font-normal'>Rating</Label>
-			<StarRating
-				initialRating={rating}
-				onChange={setRating}
-			/>
-		</div>
-	);
-}
-
-function ReviewTextBox({
-	review,
-	setReview,
-}: {
-	review: string;
-	setReview: (review: string) => void;
-}) {
-	return (
-		<div className='flex flex-col gap-1'>
-			<Label className='text-base font-normal'>Review</Label>
-			<Textarea
-				name='review'
-				required
-				className='text-slate-300'
-				placeholder='Leave a review...'
-				value={review}
-				onChange={(e) => {
-					setReview(e.target.value);
-				}}
-			/>
-		</div>
-	);
-}
-
-function InfoTable({ album }: { album: AlbumInfo }) {
 	const infoTable = {
 		'Record Label': album.label,
 		Release: new Date(album.release_date).toLocaleDateString(undefined, {
@@ -319,18 +167,20 @@ function InfoTable({ album }: { album: AlbumInfo }) {
 				0,
 			),
 		),
-		'Popularity (0-100)': album.popularity,
+		Popularity: album.popularity,
 	};
 
 	return (
-		<Table>
+		<Table className={className}>
 			<TableBody>
 				{Object.entries(infoTable).map(([key, value]) => (
 					<TableRow
 						key={key}
-						className='h-12 rounded-lg'
+						className='w-full rounded-lg text-xs lg:text-sm'
 					>
-						<TableCell className='min-w-32 p-1 break-all'>{key}</TableCell>
+						<TableCell className='min-w-0 p-1 font-medium break-all text-slate-400 lg:min-w-32'>
+							{key}
+						</TableCell>
 						<TableCell className='break-all text-white'>{value}</TableCell>
 					</TableRow>
 				))}
@@ -344,12 +194,12 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 
 	return (
 		<section className='flex flex-col gap-2'>
-			<h1 className='font-playfair text-4xl font-extrabold text-white'>
+			<h1 className='font-playfair text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl'>
 				{album.name}
 			</h1>
-			<p>
+			<p className='text-sm sm:text-base'>
 				Performed by{' '}
-				<span className='inline-flex gap-1'>
+				<span className='inline-flex flex-wrap gap-1'>
 					{album.artists.map((artist) => (
 						<a
 							className='hover:text-accent-600 underline hover:cursor-pointer'
@@ -376,23 +226,28 @@ function GenreList({ album }: { album: AlbumInfo }) {
 
 function TracksTable({
 	tracks,
+	initialTracks = 10,
 }: {
 	tracks: SpotifyApi.TrackObjectSimplified[];
+	initialTracks?: number;
 }) {
 	const [expanded, setExpanded] = useState(false);
-	const tooManyTracks = tracks.length > 10;
-	const visibleTracks = expanded ? tracks : tracks.slice(0, 10);
+	const tooManyTracks = tracks.length > initialTracks;
+	const visibleTracks = expanded ? tracks : tracks.slice(0, initialTracks);
 
 	return (
 		<>
 			<Table>
 				<TableHeader>
-					<TableRow className='border-neutral-600'>
-						<TableHead>#</TableHead>
+					<TableRow className='border-neutral-600 text-xs lg:text-sm'>
+						<TableHead className='w-8 text-right'>#</TableHead>
 						<TableHead>Title</TableHead>
-						<TableHead>Artist</TableHead>
-						<TableHead className='flex items-center justify-end'>
-							<Clock size={16} />
+						<TableHead className='hidden sm:table-cell'>Artist</TableHead>
+						<TableHead className='flex w-12 items-center justify-end'>
+							<Clock
+								size={16}
+								className='shrink-0'
+							/>
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -400,14 +255,24 @@ function TracksTable({
 					{visibleTracks.map((track) => (
 						<TableRow
 							key={track.id}
-							className='border-0'
+							className='border-0 text-xs lg:text-sm'
 						>
-							<TableCell className='text-right'>{track.track_number}</TableCell>
-							<TableCell className='text-white'>{track.name}</TableCell>
-							<TableCell>
+							<TableCell className='w-8 py-2 text-right lg:py-3'>
+								{track.track_number}
+							</TableCell>
+							<TableCell
+								className='max-w-0 truncate py-2 text-white lg:max-w-none lg:py-3'
+								title={track.name}
+							>
+								{track.name}
+							</TableCell>
+							<TableCell
+								className='hidden max-w-0 truncate py-2 sm:table-cell lg:max-w-none lg:py-3'
+								title={track.artists.map((a) => a.name).join(', ')}
+							>
 								{track.artists.map((artist) => artist.name).join(', ')}
 							</TableCell>
-							<TableCell className='text-right'>
+							<TableCell className='w-12 text-right'>
 								{msToMinAndSec(track.duration_ms)}
 							</TableCell>
 						</TableRow>
