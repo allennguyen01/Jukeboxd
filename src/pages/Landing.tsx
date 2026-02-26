@@ -27,10 +27,12 @@ export default function Landing() {
 function Hero() {
 	return (
 		<div
-			className='blurred-edges hero min-h-[calc(100vh-5rem)] max-w-(--breakpoint-xl) bg-cover bg-center'
+			className='blurred-edges hero relative -mt-6 min-h-[calc(100vh-5rem)] w-screen min-w-screen max-w-none bg-cover bg-center lg:-mt-8'
 			style={{
 				backgroundImage:
 					'url(https://media.cnn.com/api/v1/images/stellar/prod/130907221429-jukebox-1942.jpg?q=w_3580,h_2340,x_0,y_0,c_fill)',
+				marginLeft: 'calc(50% - 50vw)',
+				marginRight: 'calc(50% - 50vw)',
 			}}
 		>
 			<div className='hero-overlay bg-opacity-40'></div>
