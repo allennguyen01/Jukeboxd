@@ -45,7 +45,7 @@ export default function Album() {
 	if (isError) return <div>Error: {error.message}</div>;
 
 	return (
-		<div className='relative grid max-w-5xl grid-cols-1 gap-2 lg:grid-cols-4 lg:gap-0'>
+		<div className='relative grid w-full max-w-5xl grid-cols-1 gap-2 lg:grid-cols-4 lg:gap-0'>
 			<div className='flex h-min flex-col items-center gap-4 sm:flex-row lg:sticky lg:top-2 lg:max-w-64 lg:flex-col lg:items-start'>
 				<img
 					src={album.images[0].url}
@@ -65,7 +65,7 @@ export default function Album() {
 				</div>
 			</div>
 
-			<div className='flex min-w-0 flex-col gap-8 lg:col-span-3 lg:ml-10 lg:gap-8'>
+			<div className='flex flex-col gap-8 lg:col-span-3 lg:ml-10 lg:gap-8'>
 				<AlbumTitle album={album} />
 
 				<section>

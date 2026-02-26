@@ -41,7 +41,7 @@ export default function Reviews() {
 
 	if (isPendingReview || isPendingUser)
 		return (
-			<div className='flex w-full max-w-5xl flex-col items-center justify-center px-4 py-6 lg:p-4'>
+			<div className='flex w-full max-w-5xl flex-col items-center justify-center lg:p-4'>
 				<AlbumReviewCardSkeletons number={3} />
 			</div>
 		);
@@ -50,7 +50,7 @@ export default function Reviews() {
 
 	if (!user)
 		return (
-			<div className='flex w-full max-w-5xl flex-col items-center justify-center px-4 py-6 lg:p-4'>
+			<div className='flex w-full max-w-5xl flex-col items-center justify-center lg:p-4'>
 				<div className='my-6 flex flex-col items-center gap-2 text-center lg:my-8 lg:flex-row lg:text-left'>
 					<UserSearch size={50} />
 					<span className='text-base lg:text-lg'>
@@ -63,7 +63,7 @@ export default function Reviews() {
 
 	if (!reviews || reviews.length === 0)
 		return (
-			<div className='flex w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-6 lg:p-4'>
+			<div className='flex w-full max-w-5xl flex-col items-center justify-center gap-8 lg:p-4'>
 				<div className='mt-4 flex flex-col items-center gap-2 text-center lg:flex-row lg:text-left'>
 					<SearchSlash
 						size={30}
@@ -81,10 +81,10 @@ export default function Reviews() {
 	const sortedReviews = sortReviews(reviews, sortBy);
 
 	return (
-		<div className='flex w-full max-w-5xl flex-col items-center justify-center px-4 py-6 lg:p-4'>
+		<div className='flex w-full max-w-5xl flex-col items-center justify-center lg:p-4'>
 			<div className='flex w-full flex-col'>
 				<div className='flex items-center justify-between'>
-					<h1 className='text-base font-semibold text-slate-200 lg:text-lg'>
+					<h1 className='self-end text-base text-slate-200 lg:text-lg'>
 						REVIEWS <span className='text-slate-400'>({reviews.length})</span>
 					</h1>
 					<SortByDropdown setSortBy={setSortBy} />
@@ -110,7 +110,7 @@ function SortByDropdown({
 }) {
 	return (
 		<div className='flex items-center gap-2'>
-			<p className='shrink-0 text-lg text-slate-400'>Sort by:</p>
+			<p className='shrink-0 text-base text-slate-400 sm:text-lg'>Sort by:</p>
 			<Select
 				defaultValue='date-desc'
 				onValueChange={setSortBy}
