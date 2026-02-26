@@ -20,6 +20,7 @@ import { PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import FormFeedback from '@/components/common/FormFeedback';
+import HeaderDivider from '@/components/typography/HeaderDivider';
 
 import {
 	useProfileInfo,
@@ -69,10 +70,12 @@ export default function ProfileEdit() {
 	}
 
 	return (
-		<div className='my-8 flex w-5xl flex-col gap-4'>
-			<h1 className='text-2xl font-semibold'>Your Profile</h1>
-			<hr className='border-t border-slate-500'></hr>
-			<div className='flex justify-between'>
+		<div className='flex w-full max-w-5xl flex-col gap-2 px-4 sm:my-8 sm:gap-4 sm:px-0'>
+			<HeaderDivider
+				text='PROFILE'
+				className='text-xl sm:text-3xl'
+			/>
+			<div className='flex flex-col gap-6 sm:flex-row sm:justify-between'>
 				<ProfileForm userData={userData} />
 				<FourFavoriteAlbums />
 			</div>
@@ -161,7 +164,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 			<form
 				key={userData.id} // Ensure the form re-renders when userData changes
 				onSubmit={handleSubmit(onSubmit)}
-				className='grid grid-cols-2 gap-2 gap-x-4'
+				className='grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-x-4'
 			>
 				<FormField
 					control={control}
@@ -181,6 +184,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						<ProfileInput
 							field={field}
 							label='First name'
+							className='col-span-2 sm:col-span-1'
 						/>
 					)}
 				/>
@@ -191,6 +195,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						<ProfileInput
 							field={field}
 							label='Last name'
+							className='col-span-2 sm:col-span-1'
 						/>
 					)}
 				/>
@@ -212,6 +217,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						<ProfileInput
 							field={field}
 							label='Location'
+							className='col-span-2 sm:col-span-1'
 						/>
 					)}
 				/>
@@ -222,6 +228,7 @@ function ProfileForm({ userData }: { userData: UserProfile }) {
 						<ProfileInput
 							field={field}
 							label='Website'
+							className='col-span-2 sm:col-span-1'
 						/>
 					)}
 				/>
@@ -268,7 +275,7 @@ function ProfileInput({
 				{isTextarea ? (
 					<Textarea
 						{...field}
-						className='h-48'
+						className='h-24'
 					/>
 				) : (
 					<Input {...field} />
@@ -282,7 +289,7 @@ function ProfileInput({
 function FourFavoriteAlbums() {
 	return (
 		<div className='flex flex-col gap-2'>
-			<h3 className='text-lg'>Favorite Albums</h3>
+			<HeaderDivider text='FOUR FAVORITE ALBUMS' />
 			<div className='grid grid-cols-2 gap-4'>
 				<FavoriteAlbum rank={1} />
 				<FavoriteAlbum rank={2} />
@@ -311,7 +318,7 @@ function FavoriteAlbum({ rank }: { rank: number }) {
 			open={open}
 			onOpenChange={setOpen}
 		>
-			<DialogTrigger className='flex size-[200px] items-center justify-center rounded-lg bg-slate-600 hover:cursor-pointer hover:bg-slate-700'>
+			<DialogTrigger className='flex size-40 items-center justify-center rounded-lg bg-slate-600 hover:cursor-pointer hover:bg-slate-700 sm:size-52'>
 				{favAlbum ? (
 					<img
 						src={favAlbum.images[0].url}
