@@ -10,6 +10,7 @@ import HeaderDivider from '@/components/typography/HeaderDivider';
 import FourFavoriteAlbums from '@/components/profile/FourFavoriteAlbums';
 import RecentActivity from '@/components/profile/RecentActivity';
 import { Separator } from '@/components/ui/separator';
+import { themeBrand } from '@/config/theme';
 
 export default function Profile() {
 	const navigate = useNavigate();
@@ -32,13 +33,13 @@ export default function Profile() {
 	const { bio } = userData;
 
 	return (
-		<div className='my-5 flex w-5xl flex-col gap-6'>
-			<div className='flex items-center justify-between'>
+		<div className='my-5 flex w-full max-w-5xl flex-col gap-6 px-4 sm:px-0'>
+			<div className='flex flex-col items-center gap-4 sm:flex-row sm:justify-between'>
 				<ProfileHeader userData={userData} />
 				<ProfileStats userId={userData.id} />
 			</div>
-			<div className='flex justify-between gap-16'>
-				<div className='flex w-3xl flex-col gap-4'>
+			<div className='flex flex-col-reverse gap-8 sm:grid sm:grid-cols-5 sm:gap-16'>
+				<div className='flex w-full min-w-0 flex-col gap-4 sm:col-span-3 sm:max-w-3xl sm:flex-1'>
 					<div className='flex flex-col gap-2'>
 						<HeaderDivider text='FAVORITE ALBUMS' />
 						<FourFavoriteAlbums username={username} />
@@ -48,7 +49,7 @@ export default function Profile() {
 						<RecentActivity userId={userData.id} />
 					</div>
 				</div>
-				<div className='flex flex-col gap-4'>
+				<div className='flex w-full flex-shrink-0 flex-col gap-4 sm:col-span-2'>
 					<div className='flex flex-col gap-2'>
 						<HeaderDivider text='BIO' />
 						{bio && <p className='text-sm whitespace-pre-line'>{bio}</p>}
@@ -73,24 +74,17 @@ function ProfileHeader({ userData }: { userData: any }) {
 		last_name: lastName,
 		email,
 		location,
-		bio,
 		website,
 	} = userData;
 
 	const viewingOwnProfile = user?.id === id;
 
+	const name = firstName || lastName ? `${firstName} ${lastName}` : username;
+
 	return (
-		<section className='flex flex-col gap-4 text-slate-300'>
-			<div className='flex gap-8'>
-				<h1 className='text-2xl font-bold text-white'>
-					{firstName || lastName ? (
-						<>
-							{firstName} {lastName}
-						</>
-					) : (
-						username
-					)}
-				</h1>
+		<section className='flex flex-col items-center gap-4 text-slate-300 sm:items-start'>
+			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-8'>
+				<h1 className='text-xl font-bold text-white sm:text-2xl'>{name}</h1>
 				{viewingOwnProfile && (
 					<NavLink
 						to='/settings'
@@ -105,20 +99,20 @@ function ProfileHeader({ userData }: { userData: any }) {
 					</NavLink>
 				)}
 			</div>
-			<div className='flex gap-10'>
+			<div className='flex flex-col gap-2 text-sm sm:flex-row sm:gap-10 sm:text-base'>
 				{email && (
-					<p className='flex gap-2'>
-						<Mail /> {email}
-					</p>
+					<span className='flex gap-2'>
+						<Mail className='size-4 sm:size-5' /> {email}
+					</span>
 				)}
 				{location && (
 					<p className='flex gap-2'>
-						<MapPinHouse /> {location}
+						<MapPinHouse className='size-4 sm:size-5' /> {location}
 					</p>
 				)}
 				{website && (
 					<p className='flex gap-2'>
-						<MousePointerClick />{' '}
+						<MousePointerClick className='size-4 sm:size-5' />{' '}
 						<a
 							href={website}
 							className='hover:text-blue-400 hover:underline'
@@ -149,16 +143,21 @@ function ProfileStats({ userId }: { userId: string }) {
 	};
 
 	return (
-		<div className='flex items-center gap-2'>
+		<div className='flex items-center gap-1 sm:gap-2'>
 			{Object.entries(info).map(([key, value], i) => (
-				<div className='flex items-center gap-2'>
-					<p className='flex flex-col items-center gap-2'>
-						<span className='font-playfair text-3xl font-bold'>{value}</span>
+				<div
+					key={key}
+					className='flex items-center gap-2'
+				>
+					<p className='flex flex-col items-center gap-1 sm:gap-2'>
+						<span className='font-playfair text-2xl font-bold sm:text-3xl'>
+							{value}
+						</span>
 						<span className='text-xs text-slate-400'>{key}</span>
 					</p>
 					{i !== Object.keys(info).length - 1 && (
 						<Separator
-							className='mx-2 h-14 bg-slate-600'
+							className='mx-1 h-10 bg-slate-600 sm:mx-2 sm:h-14'
 							orientation='vertical'
 						/>
 					)}
@@ -205,14 +204,14 @@ function ReviewStats({ userId }: { userId: string }) {
 	);
 
 	return (
-		<section className='flex flex-col items-center gap-4'>
-			<p className='flex flex-col items-center gap-2'>
-				<span className='font-playfair text-3xl font-bold'>
+		<section className='flex flex-col items-center gap-3 sm:gap-4'>
+			<p className='flex flex-col items-center gap-1 sm:gap-2'>
+				<span className='font-playfair text-2xl font-bold sm:text-3xl'>
 					{averageRating}
 				</span>
 				<span className='text-xs text-slate-400'>AVERAGE RATING</span>
 			</p>
-			<div className='grid grid-cols-2 place-items-center gap-2 gap-x-8 gap-y-2'>
+			<div className='grid grid-cols-4 place-items-center gap-1 gap-x-4 gap-y-1 sm:grid-cols-2 sm:gap-2 sm:gap-x-8 sm:gap-y-2'>
 				{Array.from(ratingDistribution.entries()).map(([rating, count]) => (
 					<div
 						key={rating}
@@ -220,7 +219,12 @@ function ReviewStats({ userId }: { userId: string }) {
 					>
 						<span className='flex items-center'>
 							{rating}
-							<Star fill='lightgray' />:
+							<Star
+								fill={themeBrand.secondary}
+								stroke={themeBrand.secondary}
+								className='size-4 sm:size-5'
+							/>
+							:
 						</span>
 						{count}
 					</div>

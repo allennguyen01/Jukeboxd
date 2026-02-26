@@ -27,7 +27,7 @@ export default function FourFavoriteAlbums({ username }: { username: string }) {
 		);
 
 	return (
-		<div className='flex gap-2'>
+		<div className='grid grid-cols-2 gap-2 sm:flex sm:gap-2'>
 			{favAlbums.map((album) => (
 				<div>
 					<CoverLink
