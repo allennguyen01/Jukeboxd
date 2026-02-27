@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import spotifyClient, { useAlbumsBySearchQuery } from '../config/spotifyClient';
+import { useAlbumsBySearchQuery } from '@/config/spotifyClient';
 
 import {
 	Carousel,
@@ -9,14 +8,12 @@ import {
 	CarouselPrevious,
 } from '@/components/ui/carousel';
 import SpotifyIconButton from '@/components/icon/SpotifyIconButton';
-import HeaderDivider from '@/components/typography/HeaderDivider';
 import CoverLink, { CoverLinkSkeletons } from '@/components/CoverLink';
 import {
 	Select,
 	SelectContent,
 	SelectGroup,
 	SelectItem,
-	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';

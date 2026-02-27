@@ -3,6 +3,7 @@ import CoverLink, { CoverLinkSkeletons } from '@/components/CoverLink';
 import { AlbumReview } from '@/types/supabaseTypes';
 import { FileText } from 'lucide-react';
 import StarRating from '@/components/StarRating';
+import { themeBrand } from '@/config/theme';
 
 export default function RecentActivityCard({
 	review,
@@ -19,12 +20,12 @@ export default function RecentActivityCard({
 	return (
 		<div className='flex flex-col gap-1'>
 			<CoverLink album={album} />
-			<div className='flex items-center gap-2'>
+			<div className='hidden h-full items-center gap-2 sm:flex'>
 				{rating && (
 					<StarRating
 						initialRating={rating}
 						readOnly
-						color='lightgray'
+						color={themeBrand.secondary}
 						size='sm'
 					/>
 				)}

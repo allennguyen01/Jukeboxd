@@ -21,7 +21,7 @@ export default function RecentActivity({ userId }: { userId: string }) {
 		return <p className='text-slate-400'>No recent activity found.</p>;
 
 	return (
-		<div className='flex gap-2'>
+		<div className='grid grid-cols-2 gap-2 sm:flex sm:gap-2'>
 			{recentReviews.map((review) => (
 				<RecentActivityCard
 					key={`${review.id}-${review.user_id}`}

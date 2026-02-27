@@ -15,21 +15,19 @@ export default function IconToggle({
 	}
 
 	return (
-		<div className='flex w-20 flex-col items-center gap-1'>
-			<Toggle
-				aria-checked={checked}
-				onClick={handleToggle}
-				className='dark:data-[state=on]:text-neutral-content flex h-full flex-col dark:hover:bg-transparent dark:data-[state=on]:bg-transparent'
-			>
-				<Label className='text-base font-medium text-slate-300'>
-					{!checked ? 'Listen' : 'Listened'}
-				</Label>
-				<Ear
-					className={clsx('stroke-white', {
-						'fill-secondary-600': checked,
-					})}
-				/>
-			</Toggle>
-		</div>
+		<Toggle
+			aria-checked={checked}
+			onClick={handleToggle}
+			className='data-[state=on]:text-neutral-content flex h-full w-20 flex-col p-0 hover:cursor-pointer hover:bg-transparent data-[state=on]:bg-transparent'
+		>
+			<Label className='text-sm font-medium text-slate-300 sm:text-base'>
+				{!checked ? 'Listen' : 'Listened'}
+			</Label>
+			<Ear
+				className={clsx('size-6 stroke-white stroke-1', {
+					'fill-secondary-600': checked,
+				})}
+			/>
+		</Toggle>
 	);
 }
