@@ -18,13 +18,13 @@ export default function IconToggle({
 		<Toggle
 			aria-checked={checked}
 			onClick={handleToggle}
-			className='data-[state=on]:text-neutral-content flex h-full w-20 flex-col p-0 hover:bg-transparent data-[state=on]:bg-transparent'
+			className='data-[state=on]:text-neutral-content flex h-full w-20 flex-col p-0 hover:cursor-pointer hover:bg-transparent data-[state=on]:bg-transparent'
 		>
 			<Label className='text-sm font-medium text-slate-300 sm:text-base'>
 				{!checked ? 'Listen' : 'Listened'}
 			</Label>
 			<Ear
-				className={clsx('size-4 stroke-white stroke-1 sm:size-12', {
+				className={clsx('size-6 stroke-white stroke-1', {
 					'fill-secondary-600': checked,
 				})}
 			/>

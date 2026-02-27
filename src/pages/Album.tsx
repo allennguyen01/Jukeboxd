@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import ISO3166ToString from '@/data/ISO3166-1.alpha-2';
 import spotifyClient, { useAlbumGenres } from '@/config/spotifyClient';
@@ -19,6 +19,8 @@ import TextCollapse from '@/components/TextCollapse';
 import HeaderDivider from '@/components/typography/HeaderDivider';
 import { Button } from '@/components/ui/button';
 import ReviewForm from './album/ReviewForm';
+import clsx from 'clsx';
+import ArtistTag from '@/components/common/ArtistTag';
 
 type AlbumInfo = SpotifyApi.SingleAlbumResponse;
 
@@ -58,10 +60,7 @@ export default function Album() {
 						url={album.external_urls.spotify}
 						className='mb-2'
 					/>
-					<InfoTable
-						album={album}
-						className='hidden sm:block'
-					/>
+					<InfoTable album={album} />
 				</div>
 			</div>
 
@@ -153,7 +152,10 @@ function InfoTable({
 	className?: string;
 }) {
 	const infoTable = {
-		'Record Label': album.label,
+		'Record Label':
+			album.label && album.label.length > 30
+				? `${album.label.slice(0, 30)}...`
+				: album.label,
 		Release: new Date(album.release_date).toLocaleDateString(undefined, {
 			year: 'numeric',
 			month: 'short',
@@ -167,21 +169,23 @@ function InfoTable({
 				0,
 			),
 		),
-		Popularity: album.popularity,
+		Popularity: `${album.popularity}%`,
 	};
 
 	return (
-		<Table className={className}>
-			<TableBody>
+		<Table className={clsx('my-4 w-full', className)}>
+			<TableBody className='grid w-full grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 sm:grid-flow-row sm:grid-cols-1 sm:grid-rows-1 sm:gap-4'>
 				{Object.entries(infoTable).map(([key, value]) => (
 					<TableRow
 						key={key}
-						className='w-full rounded-lg text-xs lg:text-sm'
+						className='grid max-h-14 w-full grid-cols-5 items-center gap-x-2 text-sm sm:max-h-20 sm:grid-cols-2 sm:gap-x-4 sm:text-base'
 					>
-						<TableCell className='min-w-0 p-1 font-medium break-all text-slate-400 lg:min-w-32'>
+						<TableCell className='col-span-2 p-0 font-medium text-slate-400 sm:col-span-1 sm:min-w-32'>
 							{key}
 						</TableCell>
-						<TableCell className='break-all text-white'>{value}</TableCell>
+						<TableCell className='col-span-3 p-0 break-words text-white sm:col-span-1'>
+							{value}
+						</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
@@ -190,8 +194,6 @@ function InfoTable({
 }
 
 function AlbumTitle({ album }: { album: AlbumInfo }) {
-	const navigate = useNavigate();
-
 	return (
 		<section className='flex flex-col gap-2'>
 			<h1 className='font-playfair text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl'>
@@ -201,13 +203,7 @@ function AlbumTitle({ album }: { album: AlbumInfo }) {
 				Performed by{' '}
 				<span className='inline-flex flex-wrap gap-1'>
 					{album.artists.map((artist) => (
-						<a
-							className='hover:text-accent-600 underline hover:cursor-pointer'
-							key={artist.id}
-							onClick={() => navigate(`/artist/${artist.id}`)}
-						>
-							{artist.name}
-						</a>
+						<ArtistTag artist={artist} />
 					))}
 				</span>
 			</p>
